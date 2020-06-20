@@ -1,0 +1,49 @@
+#pragma once
+
+#include "kappa/input/abstractInput.hpp"
+#include <memory>
+#include <ostream>
+#include <iostream>
+#include <iomanip>
+#include <string>
+
+namespace kappa {
+
+template <typename T>
+class InputLogger : public AbstractInput<T> {
+public:
+  InputLogger(std::shared_ptr<AbstractInput<T>> iinput):
+    input(iinput), prefix(""), postfix("\n"), out(std::cout) {}
+
+  InputLogger(int iprecision, std::string iprefix, std::string ipostfix, std::shared_ptr<AbstractInput<T>> iinput):
+    input(iinput), prefix(iprefix), postfix(ipostfix), out(std::cout) {
+
+    out << std::setprecision(iprecision);
+  }
+
+  InputLogger(int iprecision, std::string iprefix, std::string ipostfix, std::ostream &iout, std::shared_ptr<AbstractInput<T>> iinput):
+    input(iinput), prefix(iprefix), postfix(ipostfix), out(iout) {
+
+    out << std::setprecision(iprecision);
+  }
+
+  virtual T get() const override {
+    T value = input->get();
+    out << prefix << value << postfix;
+    return value;
+  }
+
+  std::shared_ptr<AbstractInput<T>> getInput() const {
+    return input;
+  }
+
+protected:
+  std::shared_ptr<AbstractInput<T>> input{nullptr};
+
+  std::string prefix;
+  std::string postfix;
+
+  std::ostream &out;
+};
+
+}
