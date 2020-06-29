@@ -14,13 +14,10 @@ template <typename T, std::size_t N>
 class ArrayInputLogger : public AbstractInput<std::array<T,N>> {
 public:
   ArrayInputLogger(std::shared_ptr<AbstractInput<std::array<T,N>>> iinput):
-    input(iinput), prefix(""), seperator(" "), postfix("\n"), out(std::cout) {}
+    ArrayInputLogger(6, "", " ", "\n", std::cout, iinput) {}
 
   ArrayInputLogger(int iprecision, std::string iprefix, std::string iseperator, std::string ipostfix, std::shared_ptr<AbstractInput<std::array<T,N>>> iinput):
-    input(iinput), prefix(iprefix), seperator(iseperator), postfix(ipostfix), out(std::cout) {
-
-    out << std::setprecision(iprecision);
-  }
+    ArrayInputLogger(iprecision, iprefix, iseperator, ipostfix, std::cout, iinput) {}
 
   ArrayInputLogger(int iprecision, std::string iprefix, std::string iseperator, std::string ipostfix, std::ostream &iout, std::shared_ptr<AbstractInput<std::array<T,N>>> iinput):
     input(iinput), prefix(iprefix), seperator(iseperator), postfix(ipostfix), out(iout) {
@@ -55,5 +52,9 @@ protected:
 
   std::ostream &out;
 };
+
+extern template class ArrayInputLogger<double, 2>;
+extern template class ArrayInputLogger<double, 3>;
+extern template class ArrayInputLogger<double, 4>;
 
 }
