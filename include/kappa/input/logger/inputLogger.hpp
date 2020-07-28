@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kappa/input/abstractInput.hpp"
+#include "pros/rtos.hpp"
 #include <memory>
 #include <ostream>
 #include <iostream>
@@ -13,7 +14,7 @@ template <typename T>
 class InputLogger : public AbstractInput<T> {
 public:
   InputLogger(std::shared_ptr<AbstractInput<T>> iinput):
-    InputLogger(6, "", "\n", std::cout, iinput) {}
+    InputLogger(6, " ", "\n", std::cout, iinput) {}
 
   InputLogger(int iprecision, std::string iprefix, std::string ipostfix, std::shared_ptr<AbstractInput<T>> iinput):
     InputLogger(iprecision, iprefix, ipostfix, std::cout, iinput) {}
@@ -24,9 +25,9 @@ public:
     out << std::setprecision(iprecision);
   }
 
-  virtual T get() const override {
-    T value = input->get();
-    out << prefix << value << postfix;
+  virtual const T &get() override {
+    const T &value = input->get();
+    out << pros::millis() << prefix << value << postfix;
     return value;
   }
 

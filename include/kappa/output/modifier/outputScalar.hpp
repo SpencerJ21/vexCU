@@ -1,20 +1,20 @@
 #pragma once
 
 #include "kappa/output/abstractOutput.hpp"
-#include <algorithm>
 #include <memory>
 
 
 namespace kappa {
 
 template <typename T>
-class OutputClamp : public AbstractOutput<T> {
+class OutputScalar : public AbstractOutput<T> {
 public:
-  OutputClamp(T imin, T imax, std::shared_ptr<AbstractOutput<T>> ioutput):
-    output(ioutput), min(imin), max(imax) {}
+  OutputScalar(double iscalar, std::shared_ptr<AbstractOutput<T>> ioutput):
+    output(ioutput), scalar(iscalar) {}
 
   virtual void set(const T &itarget) override {
-    output->set(std::clamp(itarget, min, max));
+    target = scalar * itarget;
+    output->set(target);
   }
 
   std::shared_ptr<AbstractOutput<T>> getOutput() const {
@@ -23,10 +23,10 @@ public:
 
 protected:
   std::shared_ptr<AbstractOutput<T>> output{nullptr};
-  T min{0};
-  T max{0};
+  T target{0};
+  double scalar{0};
 };
 
-extern template class OutputClamp<double>;
+extern template class OutputScalar<double>;
 
 }

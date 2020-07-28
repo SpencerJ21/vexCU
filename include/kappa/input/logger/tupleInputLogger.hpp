@@ -2,6 +2,7 @@
 
 #include "kappa/input/abstractInput.hpp"
 #include "kappa/util/tupleLogger.hpp"
+#include "pros/rtos.hpp"
 #include <memory>
 #include <tuple>
 #include <ostream>
@@ -15,7 +16,7 @@ template <typename... T>
 class TupleInputLogger : public AbstractInput<std::tuple<T...>> {
 public:
   TupleInputLogger(std::shared_ptr<AbstractInput<std::tuple<T...>>> iinput):
-    TupleInputLogger(6, "", " ", "\n", std::cout, iinput) {}
+    TupleInputLogger(6, " ", " ", "\n", std::cout, iinput) {}
 
   TupleInputLogger(int iprecision, std::string iprefix, std::string iseperator, std::string ipostfix, std::shared_ptr<AbstractInput<std::tuple<T...>>> iinput):
     TupleInputLogger(iprecision, iprefix, iseperator, ipostfix, std::cout, iinput) {}
@@ -26,10 +27,10 @@ public:
     out << std::setprecision(iprecision);
   }
 
-  virtual std::tuple<T...> get() const override {
-    std::tuple<T...> values = input->get();
+  virtual const std::tuple<T...> &get() override {
+    const std::tuple<T...> &values = input->get();
 
-    out << prefix;
+    out << pros::millis() << prefix;
 
     printTuple(values, out, seperator);
 

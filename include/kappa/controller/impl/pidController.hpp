@@ -23,6 +23,12 @@ public:
                 const okapi::TimeUtil &itimeUtil = okapi::TimeUtilFactory::createDefault(),
                 std::unique_ptr<okapi::Filter> iderivativeFilter = std::make_unique<okapi::PassthroughFilter>());
 
+  PidController(Gains igains,
+                double ioutputMin,
+                double ioutputMax,
+                const okapi::TimeUtil &itimeUtil = okapi::TimeUtilFactory::createDefault(),
+                std::unique_ptr<okapi::Filter> iderivativeFilter = std::make_unique<okapi::PassthroughFilter>());
+
   virtual void setTarget(const double &itarget) override;
 
   virtual double step(double ireading) override;
@@ -42,8 +48,9 @@ protected:
   std::unique_ptr<okapi::SettledUtil> settledUtil{nullptr};
   std::unique_ptr<okapi::Filter> derivativeFilter{nullptr};
 
-  double integral;
-  double derivative;
+  double lastError{0};
+  double integral{0};
+  double derivative{0};
 };
 
 }

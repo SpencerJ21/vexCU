@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kappa/input/abstractInput.hpp"
+#include "pros/rtos.hpp"
 #include <memory>
 #include <array>
 #include <ostream>
@@ -14,7 +15,7 @@ template <typename T, std::size_t N>
 class ArrayInputLogger : public AbstractInput<std::array<T,N>> {
 public:
   ArrayInputLogger(std::shared_ptr<AbstractInput<std::array<T,N>>> iinput):
-    ArrayInputLogger(6, "", " ", "\n", std::cout, iinput) {}
+    ArrayInputLogger(6, " ", " ", "\n", std::cout, iinput) {}
 
   ArrayInputLogger(int iprecision, std::string iprefix, std::string iseperator, std::string ipostfix, std::shared_ptr<AbstractInput<std::array<T,N>>> iinput):
     ArrayInputLogger(iprecision, iprefix, iseperator, ipostfix, std::cout, iinput) {}
@@ -25,12 +26,12 @@ public:
     out << std::setprecision(iprecision);
   }
 
-  virtual std::array<T,N> get() const override {
-    std::array<T,N> values = input->get();
+  virtual const std::array<T,N> &get() override {
+    const std::array<T,N> &values = input->get();
 
-    out << prefix;
+    out << pros::millis() << prefix;
 
-    for(T &i : values){
+    for(const T &i : values){
       out << i << seperator;
     }
 
