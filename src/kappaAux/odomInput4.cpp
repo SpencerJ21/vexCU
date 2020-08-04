@@ -43,16 +43,19 @@ const std::array<double,6> &OdomInput4::step() {
     double lcos = cos((pose[2] * M_PI/180.0) + (dTheta * M_PI/360.0));
     double cOffset = 2 * sin(dTheta / 2);
 
-    double dlX = cOffset * (dL + dR) / (2 * dTheta);
-    double dlY = cOffset * (dB + dF) / (2 * dTheta);
+    double dV  = (dL + dR) / 2.0;
+    double dSV = (dB + dF) / 2.0;
+
+    double dlX = cOffset * dV  / dTheta;
+    double dlY = cOffset * dSV / dTheta;
 
     pose[0] += lcos * dlX -
                lsin * dlY;
     pose[1] += lcos * dlY +
                lsin * dlX;
     pose[2] += dTheta;
-    pose[3] = velFilter->   filter(dlY    / vals.timestep);
-    pose[4] = stfVelFilter->filter(dlX    / vals.timestep);
+    pose[3] = velFilter->   filter(dV     / vals.timestep);
+    pose[4] = stfVelFilter->filter(dSV    / vals.timestep);
     pose[5] = angVelFilter->filter(dTheta / vals.timestep);
   }
 

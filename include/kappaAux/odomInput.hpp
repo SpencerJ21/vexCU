@@ -13,7 +13,7 @@ public:
             std::unique_ptr<okapi::Filter> ivelFilter,
             std::unique_ptr<okapi::Filter> istfVelFilter,
             std::unique_ptr<okapi::Filter> iangVelFilter,
-            std::shared_ptr<kappa::AbstractInput<std::array<double,3>>> iinput);
+            std::shared_ptr<kappa::AbstractInput<std::array<double,3>>> iinput); // left, middle, right (positive dir front;left)
 
   virtual const std::array<double,6> &step();
 
