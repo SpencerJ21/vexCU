@@ -65,7 +65,7 @@ void opcontrol() {
       std::make_unique<okapi::PassthroughFilter>(),
       std::make_unique<okapi::PassthroughFilter>(),
       std::make_unique<okapi::PassthroughFilter>(),
-      std::make_shared<kappa::ArrayConsolidator<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
+      std::make_shared<kappa::ArrayConsolidator<double,3>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
         lEnc, bEnc, imu
       })
     );
@@ -85,8 +85,8 @@ void opcontrol() {
       std::make_unique<okapi::PassthroughFilter>(),
       std::make_unique<okapi::PassthroughFilter>(),
       std::make_unique<okapi::PassthroughFilter>(),
-      std::make_shared<kappa::ArrayConsolidator<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
-        lEnc, bEnc, rEnc, fEnc
+      std::make_shared<kappa::ArrayConsolidator<double,5>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
+        lEnc, bEnc, rEnc, fEnc, imu
       })
     );
 
