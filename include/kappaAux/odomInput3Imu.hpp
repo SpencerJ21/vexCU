@@ -1,14 +1,15 @@
 #pragma once
 #include "kappa/api.hpp"
 
-class OdomInputImu : public kappa::ComputationalInput<std::array<double,6>> {
+class OdomInput3Imu : public kappa::ComputationalInput<std::array<double,6>> {
 public:
   struct OdomVals {
+    double trackingWidth;
     double rearTrackingDist;
     double timestep;
   };
 
-  OdomInputImu(OdomVals &&ivals,
+  OdomInput3Imu(OdomVals &&ivals,
              std::unique_ptr<okapi::Filter> ivelFilter,
              std::unique_ptr<okapi::Filter> istfVelFilter,
              std::unique_ptr<okapi::Filter> iangVelFilter,
