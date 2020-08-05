@@ -1,4 +1,20 @@
 #include "main.h"
+#include "kappaAux/odomInput.hpp"
+#include "kappaAux/odomInput4.hpp"
+#include "kappaAux/odomInput2Imu.hpp"
+#include "kappaAux/odomInput3Imu.hpp"
+#include "kappaAux/odomInput4Imu.hpp"
+
+template <std::size_t N>
+void arrPrint(const std::array<double,N> &values, char id) {
+  std::cout << pros::millis() << ", #" << id << ", ";
+
+  for(const double &i : values){
+    std::cout << i << ", ";
+  }
+
+  std::cout << "0\n";
+}
 
 void initialize() {
   okapi::Logger::setDefaultLogger(std::make_shared<okapi::Logger>(std::make_unique<okapi::Timer>(), "/ser/sout", okapi::Logger::LogLevel::debug));
@@ -10,107 +26,82 @@ void competition_initialize() {}
 
 void autonomous() {}
 
-std::shared_ptr<kappa::TupleOutputLogger<double,double>> chassis;
-std::shared_ptr<kappa::InputLogger<double>> input;
-std::shared_ptr<kappa::PidController> controller;
-std::shared_ptr<kappa::ArrayInputLogger<double,3>> testInput;
+std::shared_ptr<OdomInput> odom1;
+std::shared_ptr<OdomInput4> odom2;
+std::shared_ptr<OdomInput2Imu> odom3;
+std::shared_ptr<OdomInput3Imu> odom4;
+std::shared_ptr<OdomInput4Imu> odom5;
 
 void opcontrol() {
-  auto chart = lv_chart_create(lv_scr_act(), NULL);
-  lv_obj_set_pos(chart, 0, 0);
-  lv_obj_set_size(chart, 480, 120);
-  lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
-  lv_chart_set_range(chart, -120, 120);
-  lv_chart_set_point_count(chart, 240);
-  auto targ1 = lv_chart_add_series(chart, LV_COLOR_BLACK);
-  auto read1 = lv_chart_add_series(chart, LV_COLOR_RED);
-  auto targ2 = lv_chart_add_series(chart, LV_COLOR_BLUE);
-  auto read2 = lv_chart_add_series(chart, LV_COLOR_YELLOW);
 
-  auto gauge = lv_gauge_create(lv_scr_act(), NULL);
-  lv_obj_set_size(gauge, 120, 120);
-  lv_obj_set_pos(gauge, 0, 120);
-  lv_gauge_set_range(gauge, -110, 110);
-  lv_gauge_set_critical_value(gauge, 200);
-  static lv_color_t ncolor[] = {LV_COLOR_RED};
-  lv_gauge_set_needle_count(gauge, 1, ncolor);
+  auto lEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(1,2), M_PI * 2.75 / 180.0);
+  auto rEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(3,4), M_PI * 2.75 / 180.0);
+  auto bEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(5,6), M_PI * 2.75 / 180.0);
+  auto fEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(7,8), M_PI * 2.75 / 180.0);
+  auto imu  = std::make_shared<kappa::ImuInput>(1);
 
-  chassis =
-    std::make_shared<kappa::TupleOutputLogger<double,double>>(6, " Tuple Logger ", " | ", "\n",
-      std::make_shared<kappa::TwoAxisChassis>(4, 10,
-        std::make_shared<kappa::ArrayOutputClamp<double,2>>(-100, 100,
-          std::make_shared<kappa::ArrayOutputLogger<double,2>>(6, " Array Logger ", " | ", "\n",
-            std::make_shared<kappa::ArrayDistributor<double,2>>(std::initializer_list<std::shared_ptr<kappa::AbstractOutput<double>>>{
-              std::make_shared<kappa::OutputChartLogger<double>>(chart, targ1,
-                std::make_shared<kappa::VPidSubController>(
-                  kappa::VPidSubController::Gains{50,0,50,2000}, -12000, 12000,
-                  std::make_shared<kappa::InputChartLogger<double>>(chart, read1,
-                    std::make_shared<kappa::InputDifferentiator<double>>(20.0/3.0,
-                      std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::IntegratedEncoder>(19))
-                    )
-                  ),
-                  std::make_shared<kappa::OutputLogger<double>>(6, " M1 ", "\n",
-                    std::make_shared<kappa::VoltageMotor>(std::make_shared<okapi::Motor>(19))
-                  )
-                )
-              ),
-              std::make_shared<kappa::OutputChartLogger<double>>(chart, targ2,
-                std::make_shared<kappa::VPidSubController>(
-                  kappa::VPidSubController::Gains{50,0,50,2000}, -12000, 12000,
-                  std::make_shared<kappa::InputChartLogger<double>>(chart, read2,
-                    std::make_shared<kappa::InputDifferentiator<double>>(20.0/3.0,
-                      std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::IntegratedEncoder>(20))
-                    )
-                  ),
-                  std::make_shared<kappa::OutputLogger<double>>(6, " M2 ", "\n",
-                    std::make_shared<kappa::VoltageMotor>(std::make_shared<okapi::Motor>(20))
-                  )
-                )
-              )
-            })
-          )
-        )
-      )
-    );
-
-  input =
-    std::make_shared<kappa::InputLogger<double>>(6, " Input Logger ", "\n",
-      std::make_shared<kappa::InputGaugeLogger<double>>(gauge, 0,
-        std::make_shared<kappa::OkapiInput>(
-          std::make_shared<okapi::ADIEncoder>(3,4)
-        )
-      )
-    );
-
-  controller =
-    std::make_shared<kappa::PidController>(kappa::PidController::Gains{1,0,0.5,0});
-
-
-  testInput =
-    std::make_shared<kappa::ArrayInputLogger<double,3>>(6, " Test InputArray ", " | ", "\n",
+  odom1 =
+    std::make_shared<OdomInput>(OdomInput::OdomVals{10, 5, 0.005},
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
       std::make_shared<kappa::ArrayConsolidator<double,3>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
-        std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(3,4)),
-        std::make_shared<kappa::ImuInput>(11),
-        std::make_shared<kappa::TimeInput>()
+        lEnc, bEnc, rEnc
       })
     );
 
+  odom2 =
+    std::make_shared<OdomInput4>(OdomInput4::OdomVals{10, 10, 0.005},
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_shared<kappa::ArrayConsolidator<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
+        lEnc, bEnc, rEnc, fEnc
+      })
+    );
+
+  odom3 =
+    std::make_shared<OdomInput2Imu>(OdomInput2Imu::OdomVals{5, 5, 0.005},
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_shared<kappa::ArrayConsolidator<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
+        lEnc, bEnc, imu
+      })
+    );
+
+  odom4 =
+    std::make_shared<OdomInput3Imu>(OdomInput3Imu::OdomVals{10, 5, 0.005},
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_shared<kappa::ArrayConsolidator<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
+        lEnc, bEnc, rEnc, imu
+      })
+    );
+
+  odom5 =
+    std::make_shared<OdomInput4Imu>(OdomInput4Imu::OdomVals{10, 10, 0.005},
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_shared<kappa::ArrayConsolidator<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
+        lEnc, bEnc, rEnc, fEnc
+      })
+    );
 
   pros::Task testController([&] {
     std::uint32_t now = pros::millis();
-    std::tuple<double,double> target = {50,0};
 
     while (true) {
-      std::get<1>(target) = controller->step(input->get());
-      chassis->set(target);
-
+      arrPrint(odom1->step(), '1');
+      arrPrint(odom2->step(), '2');
+      arrPrint(odom3->step(), '3');
+      arrPrint(odom4->step(), '4');
+      arrPrint(odom5->step(), '5');
       std::cout << "\n";
 
-      testInput->get();
-
-      std::cout << "\n";
-
-      pros::Task::delay_until(&now, 10);
+      pros::Task::delay_until(&now, 5);
     }
 
   }, "Test Controller");

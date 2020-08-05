@@ -13,10 +13,10 @@ OdomInput3Imu::OdomInput3Imu(OdomVals &&ivals,
 const std::array<double,6> &OdomInput3Imu::step() {
   const std::array<double,4> &in = input->get();
 
-  double dL     = (in[0] - lastIn[0]);
-  double dM     = (in[1] - lastIn[1]);
-  double dR     = (in[2] - lastIn[2]);
-  double dTheta = (in[3] - lastIn[3]);
+  double dL     = in[0] - lastIn[0];
+  double dM     = in[1] - lastIn[1];
+  double dR     = in[2] - lastIn[2];
+  double dTheta = in[3] - lastIn[3];
 
   lastIn[0] = in[0];
   lastIn[1] = in[1];

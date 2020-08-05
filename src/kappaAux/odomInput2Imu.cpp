@@ -13,9 +13,9 @@ OdomInput2Imu::OdomInput2Imu(OdomVals &&ivals,
 const std::array<double,6> &OdomInput2Imu::step() {
   const std::array<double,3> &in = input->get();
 
-  double dL     = (in[0] - lastIn[0]);
-  double dM     = (in[1] - lastIn[1]);
-  double dTheta = (in[2] - lastIn[2]);
+  double dL     = in[0] - lastIn[0];
+  double dM     = in[1] - lastIn[1];
+  double dTheta = in[2] - lastIn[2];
 
   lastIn[0] = in[0];
   lastIn[1] = in[1];
