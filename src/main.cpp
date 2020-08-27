@@ -34,10 +34,10 @@ std::shared_ptr<OdomInput4Imu> odom5;
 
 void opcontrol() {
 
-  auto lEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(1,2), M_PI * 2.75 / 180.0);
-  auto rEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(3,4), M_PI * 2.75 / 180.0);
-  auto bEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(5,6), M_PI * 2.75 / 180.0);
-  auto fEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(7,8), M_PI * 2.75 / 180.0);
+  auto lEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(1,2), M_PI * 2.75 / 360.0);
+  auto rEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(3,4), M_PI * 2.75 / 360.0);
+  auto bEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(5,6), M_PI * 2.75 / 360.0);
+  auto fEnc = std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(7,8), M_PI * 2.75 / 360.0);
   auto imu  = std::make_shared<kappa::ImuInput>(1);
 
   odom1 =
