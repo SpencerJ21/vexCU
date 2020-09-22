@@ -7,8 +7,13 @@ OdomInput2Imu::OdomInput2Imu(OdomVals &&ivals,
               std::shared_ptr<kappa::AbstractInput<std::array<double,3>>> iinput):
               input(iinput), vals(ivals), velFilter(std::move(ivelFilter)),
               stfVelFilter(std::move(istfVelFilter)),
-              angVelFilter(std::move(iangVelFilter))
-              {}
+              angVelFilter(std::move(iangVelFilter)) {
+
+  const std::array<double,3> &in = input->get();
+  lastIn[0] = in[0];
+  lastIn[1] = in[1];
+  lastIn[2] = in[2];
+}
 
 const std::array<double,6> &OdomInput2Imu::step() {
   const std::array<double,3> &in = input->get();

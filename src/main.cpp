@@ -27,15 +27,27 @@ void opcontrol() {
   imu->calibrate();
   pros::delay(5000);
 
-  std::ofstream logFile;
+  std::ofstream log("/usd/odomInputTelem.csv");
+
+  auto odomInput = std::make_shared<kappa::ArrayInputLogger<double,5>>(6, ", ", ", ", "\n", log,
+    std::make_shared<kappa::ArrayConsolidator<double,5>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
+      lEnc, rEnc, bEnc, fEnc, imu
+    })
+  );
 
   pros::Task testController([&] {
+    std::size_t count = 0;
+    auto t = pros::millis();
 
     while (true) {
 
-      std::cout << "\n";
+      odomInput->get();
 
-      pros::delay(10);
+      if (!(++count % 10)) {
+        log << std::flush;
+      }
+
+      pros::Task::delay_until(&t, 1);
     }
 
   }, "Test Controller");
