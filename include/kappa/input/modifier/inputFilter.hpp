@@ -7,12 +7,13 @@
 
 namespace kappa {
 
-template<typename T>
+template <typename T>
 class InputFilter : public AbstractInput<T> {
 public:
 
   InputFilter(std::unique_ptr<okapi::Filter> ifilter, std::shared_ptr<AbstractInput<T>> iinput):
     input(iinput), filter(std::move(ifilter)) {}
+
 
   virtual const T &get() override {
     out = static_cast<T>(filter->filter(static_cast<double>(input->get())));
@@ -30,6 +31,7 @@ protected:
   T out{0};
 };
 
-extern template class InputFilter<double>;
+  extern template class InputFilter<double>;
+
 
 }
