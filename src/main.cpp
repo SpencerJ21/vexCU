@@ -1,10 +1,5 @@
 #include "main.h"
 #include "kappaAux/odomInput.hpp"
-#include "kappaAux/odomInput4.hpp"
-#include "kappaAux/odomInput2Imu.hpp"
-#include "kappaAux/odomInput3Imu.hpp"
-#include "kappaAux/odomInput4Imu.hpp"
-#include <fstream>
 
 void initialize() {
   okapi::Logger::setDefaultLogger(std::make_shared<okapi::Logger>(std::make_unique<okapi::Timer>(), "/ser/sout", okapi::Logger::LogLevel::debug));
@@ -18,16 +13,27 @@ void autonomous() {}
 
 void opcontrol() {
 
-  auto input =
-    std::make_shared<kappa::ArrayInputLogger<double,5>>(
-      std::make_shared<kappa::FileInput<5>>("/usd/odomInputTelem.csv")
+  auto data = std::make_shared<kappa::FileInput<5>>("/usd/odomInputTelem.csv");
+  auto odom1 = std::make_shared<OdomInput>(OdomInput::OdomVals{13.425, 5.45, 0.01},
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_unique<okapi::PassthroughFilter>(),
+      std::make_shared<kappa::ArrayOutputLogger<double,6>>()
     );
 
   auto t = pros::millis();
 
+  auto count = 0;
+
   while(true) {
-    input->get();
-    pros::Task::delay_until(&t, 2);
+    data->get();
+
+    if (!(count % 1)) {
+      odom1->set(data->getValue());
+    }
+
+    count++;
+    pros::Task::delay_until(&t, 4);
   }
 
 }
