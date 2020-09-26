@@ -1,26 +1,25 @@
 #pragma once
 #include "kappa/api.hpp"
 
-class OdomInput4Imu : public kappa::ComputationalInput<std::array<double,6>> {
+class OdomInput4Imu : public kappa::AbstractOutput<std::array<double,5>> {
 public:
   struct OdomVals {
     double rlTrackingWidth;
     double fbTrackingWidth;
-    double timestep;
   };
 
   OdomInput4Imu(OdomVals &&ivals,
              std::unique_ptr<okapi::Filter> ivelFilter,
              std::unique_ptr<okapi::Filter> istfVelFilter,
              std::unique_ptr<okapi::Filter> iangVelFilter,
-             std::shared_ptr<kappa::AbstractInput<std::array<double,5>>> iinput); // left, back, right, front, imu (positive dir front;left;ccw)
+             std::shared_ptr<kappa::AbstractOutput<std::array<double,6>>> ioutput); // left, back, right, front, imu (positive dir front;left;ccw)
 
-  virtual const std::array<double,6> &step();
+  virtual void set(const std::array<double,5> &input);
 
-  virtual const std::array<double,6> &get();
+  const std::array<double,6> &get() const;
 
 protected:
-  std::shared_ptr<kappa::AbstractInput<std::array<double,5>>> input;
+  std::shared_ptr<kappa::AbstractOutput<std::array<double,6>>> output;
   OdomVals vals;
   std::unique_ptr<okapi::Filter> velFilter;
   std::unique_ptr<okapi::Filter> stfVelFilter;
@@ -28,5 +27,5 @@ protected:
 
   std::array<double,6> pose{0,0,0,0,0,0};
 
-  std::array<double,5> lastIn{0,0,0,0,0};
+  std::array<double,6> lastIn{0,0,0,0,0,0};
 };
