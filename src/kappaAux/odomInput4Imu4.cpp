@@ -28,13 +28,15 @@ void OdomInput4Imu4::set(const std::array<double,5> &input) {
   lastIn[2] = input[1];
   lastIn[3] = input[3];
 
-  if(input[4] != lastIn[4]){
-    pose[2]   = input[4] * M_PI / 180;
-    lastIn[4] = input[4];
-  }
+  double dTheta;
 
-  double dTheta = (dR - dL) / (2 * vals.rlTrackingWidth) +
-                  (dF - dB) / (2 * vals.fbTrackingWidth);
+  if(input[4] != lastIn[4]){
+    dTheta = input[4] * M_PI / 180 - pose[2];
+    lastIn[4] = input[4];
+  }else{
+    dTheta = (dR - dL) / (2 * vals.rlTrackingWidth) +
+             (dF - dB) / (2 * vals.fbTrackingWidth);
+  }
 
   if(!dTheta){
     double lsin = sin(pose[2]);

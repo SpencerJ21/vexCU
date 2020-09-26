@@ -99,8 +99,8 @@ void opcontrol() {
       //odom4->set(data->getValue()); // Poor Performance (1.68, .66, 0)
       //odom5->set(data->getValue()); // Poor Performance (1.00, 1.06, 0) (maybe improved with sensor fusion or removing resolution optimizer?)
       //odom6->set(data->getValue()); // Good Performance (.52, .12, .000) (w/removed resolution optimizer)
-      //odom7->set(data->getValue()); // Disappointing Performance (.93, -.72, .001) (w/imu and encoder heading calculation)
-      //odom8->set(data->getValue()); // Good Performance (.57, .02, .000) (w/both above changes)
+      //odom7->set(data->getValue()); // Disappointing Performance (.94, -1.03, .001) (w/imu and encoder heading calculation)
+      //odom8->set(data->getValue()); // Good Performance (.52, .12, .000) (w/both above changes)
     }
 
     count++;
