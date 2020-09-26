@@ -6,7 +6,6 @@ public:
   struct OdomVals {
     double trackingWidth;
     double rearTrackingDist;
-    double timestep;
   };
 
   OdomInput(OdomVals &&ivals,
@@ -28,5 +27,5 @@ protected:
 
   std::array<double,6> pose{0,0,0,0,0,0};
 
-  std::array<double,5> lastIn{0,0,0,0,0};
+  std::array<double,4> lastIn{0,0,0,0};
 };

@@ -14,7 +14,7 @@ void autonomous() {}
 void opcontrol() {
 
   auto data = std::make_shared<kappa::FileInput<5>>("/usd/odomInputTelem.csv");
-  auto odom1 = std::make_shared<OdomInput>(OdomInput::OdomVals{13.425, 5.45, 0.01},
+  auto odom1 = std::make_shared<OdomInput>(OdomInput::OdomVals{13.3125, 0},
       std::make_unique<okapi::PassthroughFilter>(),
       std::make_unique<okapi::PassthroughFilter>(),
       std::make_unique<okapi::PassthroughFilter>(),
@@ -33,7 +33,7 @@ void opcontrol() {
     }
 
     count++;
-    pros::Task::delay_until(&t, 4);
+    pros::Task::delay_until(&t, 2);
   }
 
 }
