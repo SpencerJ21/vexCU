@@ -1,6 +1,6 @@
-#include "kappaAux/odomInput4Imu.hpp"
+#include "kappaAux/odomInput4Imu2.hpp"
 
-OdomInput4Imu::OdomInput4Imu(OdomVals &&ivals,
+OdomInput4Imu2::OdomInput4Imu2(OdomVals &&ivals,
               std::unique_ptr<okapi::Filter> ivelFilter,
               std::unique_ptr<okapi::Filter> istfVelFilter,
               std::unique_ptr<okapi::Filter> iangVelFilter,
@@ -12,7 +12,7 @@ OdomInput4Imu::OdomInput4Imu(OdomVals &&ivals,
    lastIn[5] = pros::millis();
   }
 
-void OdomInput4Imu::set(const std::array<double,5> &input) {
+void OdomInput4Imu2::set(const std::array<double,5> &input) {
 
   double dL     = input[0] - lastIn[0];
   double dB     = input[2] - lastIn[1];
@@ -50,8 +50,8 @@ void OdomInput4Imu::set(const std::array<double,5> &input) {
     double lcos = cos(pose[2] + 0.5 * dTheta);
     double cOffset = 2 * sin(dTheta / 2);
 
-    double A_r = std::abs(dL) > std::abs(dR) ? dL / dTheta + vals.rlTrackingWidth / 2 : dR / dTheta - vals.rlTrackingWidth / 2;
-    double S_r = std::abs(dB) > std::abs(dF) ? dB / dTheta + vals.fbTrackingWidth / 2 : dF / dTheta - vals.fbTrackingWidth / 2;
+    double A_r = (dL + dR) / (2 * dTheta);
+    double S_r = (dB + dF) / (2 * dTheta);
 
     pose[0] += cOffset * (lcos * A_r - lsin * S_r);
     pose[1] += cOffset * (lcos * S_r + lsin * A_r);
@@ -64,6 +64,6 @@ void OdomInput4Imu::set(const std::array<double,5> &input) {
   output->set(pose);
 }
 
-const std::array<double,6> &OdomInput4Imu::get() const {
+const std::array<double,6> &OdomInput4Imu2::get() const {
   return pose;
 }
