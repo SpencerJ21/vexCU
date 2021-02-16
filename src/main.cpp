@@ -1,8 +1,5 @@
 #include "main.h"
-
-void initialize() {
-  okapi::Logger::setDefaultLogger(std::make_shared<okapi::Logger>(std::make_unique<okapi::Timer>(), "/ser/sout", okapi::Logger::LogLevel::debug));
-}
+#include "robot.hpp"
 
 void disabled() {}
 
@@ -11,5 +8,11 @@ void competition_initialize() {}
 void autonomous() {}
 
 void opcontrol() {
+  okapi::Controller controller;
 
+  while(true){
+    robot::chassis->set({
+      0,0,0
+    });
+  }
 }
