@@ -16,28 +16,56 @@ namespace kappa {
 template <typename... T>
 class TupleOutputLogger : public AbstractOutput<std::tuple<T...>> {
 public:
+
+  /**
+   * Logs tuple data that passes through it. By default logs to std::cout,
+   * but can also log to filestreams
+   * Assumes operator<<(std::ostream,T) is defined
+   *
+   * @param ioutput output for data
+   */
   TupleOutputLogger(std::shared_ptr<AbstractOutput<std::tuple<T...>>> ioutput = std::make_shared<NullOutput<std::tuple<T...>>>()):
-    TupleOutputLogger(6, " ", " ", "\n", std::cout, ioutput) {}
+    TupleOutputLogger(", ", ", ", "\n", std::cout, ioutput) {}
 
-  TupleOutputLogger(int iprecision, std::string iprefix, std::string iseperator, std::string ipostfix, std::shared_ptr<AbstractOutput<std::tuple<T...>>> ioutput = std::make_shared<NullOutput<std::tuple<T...>>>()):
-    TupleOutputLogger(iprecision, iprefix, iseperator, ipostfix, std::cout, ioutput) {}
+  /**
+   * @param iprefix string that preceeds each line of data
+   * @param iseparator string that is printed between each element of data
+   * @param ipostfix string that follows each line of data (like a newline char)
+   * @param ioutput output for data
+   */
+  TupleOutputLogger(std::string iprefix, std::string iseparator, std::string ipostfix, std::shared_ptr<AbstractOutput<std::tuple<T...>>> ioutput = std::make_shared<NullOutput<std::tuple<T...>>>()):
+    TupleOutputLogger(iprefix, iseparator, ipostfix, std::cout, ioutput) {}
 
-  TupleOutputLogger(int iprecision, std::string iprefix, std::string iseperator, std::string ipostfix, std::ostream &iout, std::shared_ptr<AbstractOutput<std::tuple<T...>>> ioutput = std::make_shared<NullOutput<std::tuple<T...>>>()):
-    output(ioutput), prefix(iprefix), seperator(iseperator), postfix(ipostfix), out(iout) {
+  /**
+   * @param iprefix string that preceeds each line of data
+   * @param iseparator string that is printed between each element of data
+   * @param ipostfix string that follows each line of data (like a newline char)
+   * @param iout ostream to print data to
+   * @param ioutput output for data
+   */
+  TupleOutputLogger(std::string iprefix, std::string iseparator, std::string ipostfix, std::ostream &iout, std::shared_ptr<AbstractOutput<std::tuple<T...>>> ioutput = std::make_shared<NullOutput<std::tuple<T...>>>()):
+    output(ioutput), prefix(iprefix), separator(iseparator), postfix(ipostfix), out(iout) {}
 
-    out << std::setprecision(iprecision);
-  }
-
+  /**
+   * Logs the target data and passes it to the output
+   *
+   * @param itarget target data
+   */
   virtual void set(const std::tuple<T...> &itarget) override {
     out << pros::millis() << prefix;
 
-    printTuple(itarget, out, seperator);
+    printTuple(itarget, out, separator);
 
     out << postfix;
 
     output->set(itarget);
   }
 
+  /**
+   * Gets output
+   *
+   * @return output
+   */
   std::shared_ptr<AbstractOutput<std::tuple<T...>>> getOutput() const {
     return output;
   };
@@ -46,7 +74,7 @@ protected:
   std::shared_ptr<AbstractOutput<std::tuple<T...>>> output{nullptr};
 
   std::string prefix;
-  std::string seperator;
+  std::string separator;
   std::string postfix;
 
   std::ostream &out;
