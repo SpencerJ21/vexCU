@@ -3,7 +3,7 @@
 
 namespace robot {
 
-extern std::shared_ptr<kappa::ThreeAxisChassis> chassis;
+extern std::shared_ptr<kappa::XDriveChassis> chassis;
 extern std::shared_ptr<kappa::ImuInput> imu;
 
 }
