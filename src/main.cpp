@@ -26,10 +26,10 @@ void opcontrol() {
 
     while(!buttonA.changedToPressed()){
 
-      robot::chassis->setPolar({
-        140 * controller.getAnalog(okapi::ControllerAnalog::rightY),
+      robot::slewChassis->set({
+        controller.getDigital(okapi::ControllerDigital::R1) ? 140 : 0,
         std::atan2(-controller.getAnalog(okapi::ControllerAnalog::leftX), controller.getAnalog(okapi::ControllerAnalog::leftY)),
-        0.0
+        -5 * controller.getAnalog(okapi::ControllerAnalog::rightX)
       });
 
       pros::delay(10);

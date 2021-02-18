@@ -1,0 +1,31 @@
+#include "kappaAux/XDriveSlew.hpp"
+#include <cmath>
+
+XDriveSlew::XDriveSlew(double ispdSlewStep, double idirSlewStep, std::shared_ptr<kappa::XDriveChassis> ichassis):
+    spdSlewStep(ispdSlewStep), dirSlewStep(idirSlewStep), chassis(ichassis){}
+
+void XDriveSlew::set(const std::tuple<double,double,double> &itarget){
+  double spdDiff = std::get<0>(itarget) - std::get<0>(out);
+
+  // normal slew alg
+  std::get<0>(out) += spdDiff > 0 ?
+          std::min(spdDiff, spdSlewStep) : std::max(spdDiff, -spdSlewStep);
+
+  // angle difference on [-pi,pi]
+  double angDiff = atan2( sin(std::get<1>(itarget) - std::get<1>(out)),
+                          cos(std::get<1>(itarget) - std::get<1>(out)));
+
+  // scale slew value inversely with speed (infinite directional slew when static)
+  std::get<1>(out) += angDiff > 0 ?
+          std::min(angDiff,  dirSlewStep / std::get<0>(out)):
+          std::max(angDiff, -dirSlewStep / std::get<0>(out));
+
+  // preserve curvature
+  std::get<2>(out) = std::get<2>(itarget) * (std::get<0>(out) / std::get<0>(itarget));
+
+  chassis->setPolar(out);
+}
+
+std::shared_ptr<kappa::XDriveChassis> XDriveSlew::getOutput() const {
+  return chassis;
+}

@@ -3,6 +3,7 @@
 namespace robot {
 
 std::shared_ptr<kappa::XDriveChassis> chassis;
+std::shared_ptr<XDriveSlew> slewChassis;
 std::shared_ptr<kappa::ImuInput> imu;
 
 }
@@ -21,5 +22,7 @@ void initialize(){
         })
       )
     );
+
+  robot::slewChassis = std::make_shared<XDriveSlew>(2, 8, robot::chassis);
 
 }
