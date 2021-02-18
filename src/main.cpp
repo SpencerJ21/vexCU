@@ -16,9 +16,11 @@ void opcontrol() {
 
       robot::chassis->set({
         140 * controller.getAnalog(okapi::ControllerAnalog::leftY),
-        140 * controller.getAnalog(okapi::ControllerAnalog::leftX),
-          5 * controller.getAnalog(okapi::ControllerAnalog::rightX)
+       -140 * controller.getAnalog(okapi::ControllerAnalog::leftX),
+         -5 * controller.getAnalog(okapi::ControllerAnalog::rightX)
       });
+
+      pros::delay(10);
 
     }
 
@@ -26,9 +28,11 @@ void opcontrol() {
 
       robot::chassis->setPolar({
         140 * controller.getAnalog(okapi::ControllerAnalog::rightY),
-        std::atan2(controller.getAnalog(okapi::ControllerAnalog::leftY), -controller.getAnalog(okapi::ControllerAnalog::leftX)),
+        std::atan2(-controller.getAnalog(okapi::ControllerAnalog::leftX), controller.getAnalog(okapi::ControllerAnalog::leftY)),
         0.0
       });
+
+      pros::delay(10);
 
     }
   }
