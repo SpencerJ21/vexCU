@@ -17,9 +17,9 @@ void opcontrol() {
     while(!buttonA.changedToPressed()){
 
       robot::chassis->set({
-        140 * controller.getAnalog(okapi::ControllerAnalog::leftY),
-       -140 * controller.getAnalog(okapi::ControllerAnalog::leftX),
-         -5 * controller.getAnalog(okapi::ControllerAnalog::rightX)
+        67 * controller.getAnalog(okapi::ControllerAnalog::leftY),
+       -67 * controller.getAnalog(okapi::ControllerAnalog::leftX),
+        -5 * controller.getAnalog(okapi::ControllerAnalog::rightX)
       });
 
       pros::delay(10);
@@ -31,7 +31,7 @@ void opcontrol() {
     while(!buttonA.changedToPressed()){
 
       robot::slewChassis->set({
-        controller.getDigital(okapi::ControllerDigital::R1) ? 140 : 0,
+        controller.getDigital(okapi::ControllerDigital::R1) ? 67 : 0,
         std::atan2(-controller.getAnalog(okapi::ControllerAnalog::leftX), controller.getAnalog(okapi::ControllerAnalog::leftY)),
         -5 * controller.getAnalog(okapi::ControllerAnalog::rightX)
       });
