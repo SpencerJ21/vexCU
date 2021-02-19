@@ -20,8 +20,10 @@ void XDriveSlew::set(const std::tuple<double,double,double> &itarget){
           std::min(angDiff,  dirSlewStep / std::get<0>(out)):
           std::max(angDiff, -dirSlewStep / std::get<0>(out));
 
-  // preserve curvature
-  std::get<2>(out) = std::get<2>(itarget) * (std::get<0>(out) / std::get<0>(itarget));
+  // if target speed is nonzero, preserve curvature. Otherwise, preserve rotation
+  std::get<2>(out) = std::get<0>(itarget) != 0 ?
+                          std::get<2>(itarget) * (std::get<0>(out) / std::get<0>(itarget)):
+                          std::get<2>(itarget);
 
   chassis->setPolar(out);
 }

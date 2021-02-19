@@ -23,6 +23,6 @@ void initialize(){
       )
     );
 
-  robot::slewChassis = std::make_shared<XDriveSlew>(2, 8, robot::chassis);
+  robot::slewChassis = std::make_shared<XDriveSlew>(4, 10, robot::chassis);
 
 }

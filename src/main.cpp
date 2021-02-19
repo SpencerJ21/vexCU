@@ -12,6 +12,8 @@ void opcontrol() {
   auto buttonA = controller[okapi::ControllerDigital::A];
 
   while(true){
+    controller.setText(0, 0, "A");
+
     while(!buttonA.changedToPressed()){
 
       robot::chassis->set({
@@ -23,6 +25,8 @@ void opcontrol() {
       pros::delay(10);
 
     }
+
+    controller.setText(0, 0, "B");
 
     while(!buttonA.changedToPressed()){
 
