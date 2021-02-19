@@ -11,6 +11,8 @@ void opcontrol() {
   okapi::Controller controller;
   auto buttonA = controller[okapi::ControllerDigital::A];
 
+  auto headingController = std::make_shared<kappa::PidController>(kappa::PidController::Gains{1,0,1,0});
+
   while(true){
     controller.setText(0, 0, "A");
 
@@ -31,9 +33,10 @@ void opcontrol() {
     while(!buttonA.changedToPressed()){
 
       robot::slewChassis->set({
-        controller.getDigital(okapi::ControllerDigital::R1) ? 67 : 0,
+        controller.getDigital(okapi::ControllerDigital::R1) ? 67 :
+            controller.getDigital(okapi::ControllerDigital::R2) ? -67 : 0,
         std::atan2(-controller.getAnalog(okapi::ControllerAnalog::leftX), controller.getAnalog(okapi::ControllerAnalog::leftY)),
-        -5 * controller.getAnalog(okapi::ControllerAnalog::rightX)
+        headingController->step(robot::imu->get())
       });
 
       pros::delay(10);
