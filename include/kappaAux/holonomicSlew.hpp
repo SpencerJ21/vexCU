@@ -5,18 +5,18 @@
 #include <memory>
 
 
-class XDriveSlew : public kappa::AbstractOutput<std::tuple<double,double,double>> {
+class HolonomicSlew : public kappa::AbstractOutput<std::tuple<double,double,double>> {
 public:
 
   /**
-   * Applies a slew controller to the target velocity of an XDrive in polar form
+   * Applies a slew controller to the target velocity of a holonomic chassis in polar form
    *
    * @param ispdSlewStep the maximum amount the speed can change in one iteration
    * @param idirSlewStep the maximum amount the direction can change in one
    *    iteration per unit speed (should be large)
    * @param ichassis XDrive chassis
    */
-  XDriveSlew(double ispdSlewStep, double idirSlewStep, std::shared_ptr<kappa::XDriveChassis> ichassis);
+  HolonomicSlew(double ispdSlewStep, double idirSlewStep, std::shared_ptr<kappa::XDriveChassis> ichassis);
 
   /**
    * Using a polar target signal of (velocity, direction, rotation),

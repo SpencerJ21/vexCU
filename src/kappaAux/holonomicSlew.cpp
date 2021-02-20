@@ -1,10 +1,10 @@
-#include "kappaAux/XDriveSlew.hpp"
+#include "kappaAux/holonomicSlew.hpp"
 #include <cmath>
 
-XDriveSlew::XDriveSlew(double ispdSlewStep, double idirSlewStep, std::shared_ptr<kappa::XDriveChassis> ichassis):
+HolonomicSlew::HolonomicSlew(double ispdSlewStep, double idirSlewStep, std::shared_ptr<kappa::XDriveChassis> ichassis):
     spdSlewStep(ispdSlewStep), dirSlewStep(idirSlewStep), chassis(ichassis){}
 
-void XDriveSlew::set(const std::tuple<double,double,double> &itarget){
+void HolonomicSlew::set(const std::tuple<double,double,double> &itarget){
   double spdDiff = std::get<0>(itarget) - std::get<0>(out);
 
   // normal slew alg
@@ -28,6 +28,6 @@ void XDriveSlew::set(const std::tuple<double,double,double> &itarget){
   chassis->setPolar(out);
 }
 
-std::shared_ptr<kappa::XDriveChassis> XDriveSlew::getOutput() const {
+std::shared_ptr<kappa::XDriveChassis> HolonomicSlew::getOutput() const {
   return chassis;
 }
