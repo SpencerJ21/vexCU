@@ -3,8 +3,11 @@
 namespace robot {
 
 std::shared_ptr<kappa::XDriveChassis> chassis;
-std::shared_ptr<XDriveSlew> slewChassis;
+std::shared_ptr<HolonomicSlew> slewChassis;
 std::shared_ptr<kappa::ImuInput> imu;
+
+double maxLinearSpeed{67}; // in/s
+double maxAngularSpeed{5}; // rad/s
 
 }
 
@@ -23,6 +26,6 @@ void initialize(){
       )
     );
 
-  robot::slewChassis = std::make_shared<XDriveSlew>(4, 10, robot::chassis);
+  robot::slewChassis = std::make_shared<HolonomicSlew>(4, 10, robot::chassis);
 
 }
