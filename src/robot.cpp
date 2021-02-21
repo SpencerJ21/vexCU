@@ -28,4 +28,10 @@ void initialize(){
 
   robot::slewChassis = std::make_shared<HolonomicSlew>(4, 10, robot::chassis);
 
+  robot::imu = std::make_shared<kappa::ImuInput>(9);
+
+  robot::imu->calibrate();
+
+  pros::delay(2500);
+
 }
