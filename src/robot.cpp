@@ -9,6 +9,7 @@ std::shared_ptr<kappa::AbstractInput<std::array<double,4>>> sensorArray;
 
 std::shared_ptr<Odom3EncImu> odometry;
 std::shared_ptr<HolonomicSlew> slewChassis;
+std::shared_ptr<HoloPoseController> poseController;
 
 double maxLinearSpeed{67}; // in/s
 double maxAngularSpeed{5}; // rad/s
@@ -48,6 +49,11 @@ void initialize(){
     std::make_unique<okapi::PassthroughFilter>(),
     std::make_unique<okapi::PassthroughFilter>(),
     robot::sensorArray
+  );
+
+  robot::poseController = std::make_shared<HoloPoseController>(
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{4,0,4,0}),
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{6,0,6,0})
   );
 
   robot::imu->calibrate();

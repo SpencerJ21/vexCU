@@ -109,5 +109,14 @@ void opcontrol() {
       pros::delay(10);
 
     }
+
+    while(!robot::poseController->isSettled()){
+
+      controllerSetText(0, 0, "E         ");
+
+      robot::slewChassis->set(robot::poseController->step(robot::odometry->get()));
+
+      pros::delay(10);
+    }
   }
 }
