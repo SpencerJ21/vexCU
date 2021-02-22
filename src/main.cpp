@@ -27,6 +27,24 @@ void opcontrol() {
 
   auto headingController = std::make_shared<kappa::PidController>(kappa::PidController::Gains{0.1,0,0.1,0});
 
+  pros::Task odomTask([&]{
+		auto t = pros::millis();
+
+		while(true){
+			robot::odometry->step();
+
+			pros::Task::delay_until(&t, 10);
+		}
+	}, "Odom Task");
+
+  pros::Task logTask([&]{
+    while(true){
+      auto pose = robot::odometry->get();
+      std::cout << "(" << pose.x << ", " << pose.y << ", " << pose.theta << ")\n";
+      pros::delay(100);
+    }
+  }, "Log Task");
+
   while(true){
 
     while(!buttonA.changedToPressed()){

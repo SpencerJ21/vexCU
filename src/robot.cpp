@@ -3,10 +3,12 @@
 namespace robot {
 
 std::shared_ptr<kappa::XDriveChassis> chassis;
-std::shared_ptr<HolonomicSlew> slewChassis;
 std::shared_ptr<kappa::ImuInput> imu;
 std::shared_ptr<okapi::Controller> controller;
+std::shared_ptr<kappa::AbstractInput<std::array<double,4>>> sensorArray;
 
+std::shared_ptr<Odom3EncImu> odometry;
+std::shared_ptr<HolonomicSlew> slewChassis;
 
 double maxLinearSpeed{67}; // in/s
 double maxAngularSpeed{5}; // rad/s
@@ -32,7 +34,21 @@ void initialize(){
 
   robot::imu = std::make_shared<kappa::ImuInput>(9);
 
+  robot::sensorArray = std::make_shared<kappa::ArrayConsolidator<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
+    std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(0,0), 0),
+    std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(0,0), 0),
+    std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(0,0), 0),
+    robot::imu
+  });
+
   robot::controller = std::make_shared<okapi::Controller>();
+
+  robot::odometry = std::make_shared<Odom3EncImu>(
+    std::make_unique<okapi::PassthroughFilter>(),
+    std::make_unique<okapi::PassthroughFilter>(),
+    std::make_unique<okapi::PassthroughFilter>(),
+    robot::sensorArray
+  );
 
   robot::imu->calibrate();
 
