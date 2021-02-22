@@ -5,6 +5,17 @@ inline double deadzone(double val, double threshold){
   return std::abs(val) > threshold ? val : 0;
 }
 
+std::int32_t controllerSetText(std::uint8_t iline, std::uint8_t icol, std::string itext){
+  static uint32_t t{0};
+
+  if(pros::millis() - 100 < t){
+    return 1;
+  }else{
+    t = pros::millis();
+    return robot::controller->setText(iline, icol, itext);
+  }
+}
+
 void disabled() {}
 
 void competition_initialize() {}
@@ -12,8 +23,7 @@ void competition_initialize() {}
 void autonomous() {}
 
 void opcontrol() {
-  okapi::Controller controller;
-  auto buttonA = controller[okapi::ControllerDigital::A];
+  auto buttonA = (*robot::controller)[okapi::ControllerDigital::A];
 
   auto headingController = std::make_shared<kappa::PidController>(kappa::PidController::Gains{0.1,0,0.1,0});
 
@@ -21,12 +31,12 @@ void opcontrol() {
 
     while(!buttonA.changedToPressed()){
 
-      controller.setText(0, 0, "A       ");
+      controllerSetText(0, 0, "A       ");
 
       robot::chassis->set({
-        robot::maxLinearSpeed  * controller.getAnalog(okapi::ControllerAnalog::leftY),
-       -robot::maxLinearSpeed  * controller.getAnalog(okapi::ControllerAnalog::leftX),
-       -robot::maxAngularSpeed * controller.getAnalog(okapi::ControllerAnalog::rightX)
+        robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftY),
+       -robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftX),
+       -robot::maxAngularSpeed * robot::controller->getAnalog(okapi::ControllerAnalog::rightX)
       });
 
       pros::delay(10);
@@ -35,13 +45,13 @@ void opcontrol() {
 
     while(!buttonA.changedToPressed()){
 
-      controller.setText(0, 0, "B" + std::to_string(headingController->getTarget()) + "   ");
+      controllerSetText(0, 0, "B" + std::to_string(headingController->getTarget()) + "   ");
 
-      headingController->setTarget(headingController->getTarget() - robot::maxAngularSpeed * controller.getAnalog(okapi::ControllerAnalog::rightX) * 0.01 * 180 / M_PI);
+      headingController->setTarget(headingController->getTarget() - robot::maxAngularSpeed * robot::controller->getAnalog(okapi::ControllerAnalog::rightX) * 0.01 * 180 / M_PI);
 
       robot::chassis->set({
-        robot::maxLinearSpeed  * controller.getAnalog(okapi::ControllerAnalog::leftY),
-       -robot::maxLinearSpeed  * controller.getAnalog(okapi::ControllerAnalog::leftX),
+        robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftY),
+       -robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftX),
         deadzone(headingController->step(robot::imu->get()), 0.1)
       });
 
@@ -51,13 +61,13 @@ void opcontrol() {
 
     while(!buttonA.changedToPressed()){
 
-      controller.setText(0, 0, "C" + std::to_string(headingController->getTarget()) + "   ");
+      controllerSetText(0, 0, "C" + std::to_string(headingController->getTarget()) + "   ");
 
-      headingController->setTarget(headingController->getTarget() - robot::maxAngularSpeed * controller.getAnalog(okapi::ControllerAnalog::rightX) * 0.01 * 180 / M_PI);
+      headingController->setTarget(headingController->getTarget() - robot::maxAngularSpeed * robot::controller->getAnalog(okapi::ControllerAnalog::rightX) * 0.01 * 180 / M_PI);
 
       robot::slewChassis->set({
-        controller.getDigital(okapi::ControllerDigital::R1) ? robot::maxLinearSpeed : 0,
-        std::atan2(-controller.getAnalog(okapi::ControllerAnalog::leftX), controller.getAnalog(okapi::ControllerAnalog::leftY)),
+        robot::controller->getDigital(okapi::ControllerDigital::R1) ? robot::maxLinearSpeed : 0,
+        std::atan2(-robot::controller->getAnalog(okapi::ControllerAnalog::leftX), robot::controller->getAnalog(okapi::ControllerAnalog::leftY)),
         deadzone(headingController->step(robot::imu->get()), 0.1)
       });
 
@@ -68,13 +78,13 @@ void opcontrol() {
 
     while(!buttonA.changedToPressed()){
 
-      controller.setText(0, 0, "D" + std::to_string(headingController->getTarget()) + "   ");
+      controllerSetText(0, 0, "D" + std::to_string(headingController->getTarget()) + "   ");
 
-      headingController->setTarget(headingController->getTarget() - robot::maxAngularSpeed * controller.getAnalog(okapi::ControllerAnalog::rightX) * 0.01 * 180 / M_PI);
+      headingController->setTarget(headingController->getTarget() - robot::maxAngularSpeed * robot::controller->getAnalog(okapi::ControllerAnalog::rightX) * 0.01 * 180 / M_PI);
 
       robot::slewChassis->set({
-        controller.getDigital(okapi::ControllerDigital::R1) ? robot::maxLinearSpeed : 0,
-        std::atan2(-controller.getAnalog(okapi::ControllerAnalog::leftX), controller.getAnalog(okapi::ControllerAnalog::leftY)) - M_PI / 180 * robot::imu->get(),
+        robot::controller->getDigital(okapi::ControllerDigital::R1) ? robot::maxLinearSpeed : 0,
+        std::atan2(-robot::controller->getAnalog(okapi::ControllerAnalog::leftX), robot::controller->getAnalog(okapi::ControllerAnalog::leftY)) - M_PI / 180 * robot::imu->get(),
         deadzone(headingController->step(robot::imu->get()), 0.1)
       });
 
