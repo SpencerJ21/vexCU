@@ -34,7 +34,7 @@ std::tuple<double,double,double> HoloPoseController::step(Pose ireading){
 
   return {
     std::clamp(linearController->step(distance), std::get<0>(outputMin), std::get<0>(outputMax)),
-    atan2(dy,dx),
+    atan2(dy,dx) - ireading.theta,
     std::clamp(angularController->step(ireading.theta), std::get<2>(outputMin), std::get<2>(outputMax))
   };
 }
