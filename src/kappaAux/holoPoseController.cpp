@@ -30,7 +30,7 @@ std::tuple<double,double,double> HoloPoseController::step(Pose ireading){
   double dy = target.y - ireading.y;
   double dx = target.x - ireading.x;
 
-  double distance = dy * dy + dx * dx;
+  double distance = sqrt(dy * dy + dx * dx);
 
   return {
     std::clamp(linearController->step(distance), std::get<0>(outputMin), std::get<0>(outputMax)),
