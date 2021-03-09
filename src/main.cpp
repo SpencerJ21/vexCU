@@ -51,6 +51,26 @@ void opcontrol() {
 
       controllerSetText(0, 0, "A       ");
 
+      if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
+        robot::intake->runAll();
+      }else{
+
+        if(robot::controller->getDigital(okapi::ControllerDigital::R1)){
+          robot::intake->intake();
+        }else{
+
+          if(robot::controller->getDigital(okapi::ControllerDigital::L2)){
+            robot::intake->outtake();
+          }else{
+
+            if(robot::controller->getDigital(okapi::ControllerDigital::R2)){
+              robot::intake->dump();
+            }else{
+              robot::intake->idle();
+            }
+          }
+        }
+      }
       robot::chassis->set({
         robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftY),
        -robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftX),
