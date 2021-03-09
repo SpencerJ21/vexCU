@@ -63,7 +63,7 @@ void opcontrol() {
             robot::intake->outtake();
           }else{
 
-            if(robot::controller->getDigital(okapi::ControllerDigital::R2)){
+            if(robot::controller->getDigital(okapi::ControllerDigital::Y)){
               robot::intake->dump();
             }else{
               robot::intake->idle();

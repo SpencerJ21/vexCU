@@ -9,29 +9,29 @@ Intake::Intake(std::int8_t iintakeL, std::int8_t iintakeR, std::int8_t iuptake1,
   outtake1.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 }
 
-void Intake::runBField(int8_t bfield){
-  intakeL.moveVoltage( bfield & 0b00001000 ? (bfield > 0 ? 12000 : -12000) : 0);
-  intakeR.moveVoltage( bfield & 0b00000100 ? (bfield > 0 ? 12000 : -12000) : 0);
-  uptake1.moveVoltage( bfield & 0b00000010 ? (bfield > 0 ? 12000 : -12000) : 0);
-  outtake1.moveVoltage(bfield & 0b00000001 ? (bfield > 0 ? 12000 : -12000) : 0);
+void Intake::runBField(uint8_t bfield){
+  intakeL.moveVoltage(voltage[(bfield & 0b11000000) >> 6]);
+  intakeR.moveVoltage(voltage[(bfield & 0b00110000) >> 4]);
+  uptake1.moveVoltage(voltage[(bfield & 0b00001100) >> 2]);
+  outtake1.moveVoltage(voltage[bfield & 0b00000011]);
 }
 
 void Intake::intake(){
-  runBField(0b1110);
+  runBField(0b10101000);
 }
 
 void Intake::outtake(){
-  runBField(0b0011);
+  runBField(0b00001010);
 }
 
 void Intake::runAll(){
-  runBField(0b1111);
+  runBField(0b10101010);
 }
 
 void Intake::dump(){
-  runBField(-0b1111);
+  runBField(0b01010101);
 }
 
 void Intake::idle(){
-  runBField(0b0000);
+  runBField(0b00000000);
 }
