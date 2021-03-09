@@ -3,7 +3,8 @@
 HoloPoseController::HoloPoseController(std::unique_ptr<kappa::PidController> ilinearController,
                                        std::unique_ptr<kappa::PidController> iangularController):
                                        linearController(std::move(ilinearController)),
-                                       angularController(std::move(iangularController)){ reset(); }
+                                       angularController(std::move(iangularController)),
+                                       stopping(true){ reset(); }
 
 void HoloPoseController::setTarget(const Pose &itarget) {
   target = itarget;
@@ -30,17 +31,21 @@ std::tuple<double,double,double> HoloPoseController::step(Pose ireading){
   double dy = target.y - ireading.y;
   double dx = target.x - ireading.x;
 
-  double distance = sqrt(dy * dy + dx * dx);
+  distance = sqrt(dy * dy + dx * dx);
 
   return {
-    std::clamp(linearController->step(distance), std::get<0>(outputMin), std::get<0>(outputMax)),
+    stopping ? std::clamp(linearController->step(distance), std::get<0>(outputMin), std::get<0>(outputMax)) : std::get<0>(outputMax),
     atan2(dy,dx) - ireading.theta,
     std::clamp(angularController->step(ireading.theta), std::get<2>(outputMin), std::get<2>(outputMax))
   };
 }
 
 bool HoloPoseController::isSettled(){
-  return linearController->isSettled() && angularController->isSettled();
+  if(stopping){
+    return linearController->isSettled() && angularController->isSettled();
+  }else{
+    return distance < 3 && angularController->isSettled();
+  }
 }
 
 void HoloPoseController::reset(){
@@ -51,4 +56,8 @@ void HoloPoseController::reset(){
 
 void HoloPoseController::disable(bool iisDisabled) {
   disabled = iisDisabled;
+}
+
+void HoloPoseController::setStopping(bool istopping){
+  stopping = istopping;
 }

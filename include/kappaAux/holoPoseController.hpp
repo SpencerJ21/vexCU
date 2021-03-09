@@ -24,6 +24,8 @@ public:
 
   virtual void disable(bool iisDisabled) override;
 
+  void setStopping(bool istopping);
+
 protected:
 
   std::unique_ptr<kappa::PidController> linearController;
@@ -31,5 +33,8 @@ protected:
 
   std::tuple<double,double,double> outputMin{-DBL_MAX, -DBL_MAX, -DBL_MAX};
   std::tuple<double,double,double> outputMax{ DBL_MAX,  DBL_MAX,  DBL_MAX};
+
+  double distance;
+  bool stopping;
 
 };

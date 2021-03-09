@@ -20,8 +20,6 @@ void disabled() {}
 
 void competition_initialize() {}
 
-void autonomous() {}
-
 void opcontrol() {
   auto buttonA = (*robot::controller)[okapi::ControllerDigital::A];
 
