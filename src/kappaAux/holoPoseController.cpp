@@ -49,8 +49,8 @@ bool HoloPoseController::isSettled(){
 }
 
 void HoloPoseController::reset(){
-  linearController.reset();
-  angularController.reset();
+  linearController->reset();
+  angularController->reset();
   target = {0,0,0,0,0,0};
 }
 

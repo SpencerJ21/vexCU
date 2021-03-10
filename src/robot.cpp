@@ -37,9 +37,9 @@ void initialize(){
   robot::imu = std::make_shared<kappa::ImuInput>(7);
 
   robot::sensorArray = std::make_shared<kappa::ArrayConsolidator<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractInput<double>>>{
-    std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(0,0), 0.0238149606299),
-    std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(0,0), 0.0238149606299),
-    std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(0,0), 0.0238149606299),
+    std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(5,6), -0.0238149606299),
+    std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(7,8),  0.0238149606299),
+    std::make_shared<kappa::OkapiInput>(std::make_shared<okapi::ADIEncoder>(3,4), -0.0238149606299),
     robot::imu
   });
 
@@ -55,7 +55,7 @@ void initialize(){
   );
 
   robot::poseController = std::make_shared<HoloPoseController>(
-    std::make_unique<kappa::PidController>(kappa::PidController::Gains{4,0,4,0}),
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{4,0,4,0}, okapi::TimeUtilFactory::withSettledUtilParams(1, 5,  10 * okapi::millisecond)),
     std::make_unique<kappa::PidController>(kappa::PidController::Gains{6,0,6,0}, okapi::TimeUtilFactory::withSettledUtilParams(3, 10, 10 * okapi::millisecond))
   );
 
