@@ -8,6 +8,9 @@ HoloPoseController::HoloPoseController(std::unique_ptr<kappa::PidController> ili
 
 void HoloPoseController::setTarget(const Pose &itarget) {
   target = itarget;
+
+  linearController->setTarget(0); // drive distance to 0
+  angularController->setTarget(target.theta); //drive heading to target theta
 }
 
 void HoloPoseController::setOutputLimits(std::tuple<double,double,double> imin, std::tuple<double,double,double> imax) {

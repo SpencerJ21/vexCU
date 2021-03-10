@@ -1,6 +1,12 @@
 #include "main.h"
 #include "robot.hpp"
 
+void disabled() {}
+
+void competition_initialize() {}
+
+
+
 inline double deadzone(double val, double threshold){
   return std::abs(val) > threshold ? val : 0;
 }
@@ -14,9 +20,30 @@ std::int32_t controllerSetText(uint32_t *t, std::uint8_t iline, std::uint8_t ico
   }
 }
 
-void disabled() {}
+void intakeControl(){
+  if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
+    robot::intake->runAll();
 
-void competition_initialize() {}
+  }else if(robot::controller->getDigital(okapi::ControllerDigital::R1)){
+    robot::intake->intake();
+
+  }else if(robot::controller->getDigital(okapi::ControllerDigital::R2)){
+    robot::intake->runBField(0b11111100);
+
+  }else if(robot::controller->getDigital(okapi::ControllerDigital::L2)){
+    robot::intake->outtake();
+
+  }else if(robot::controller->getDigital(okapi::ControllerDigital::Y)){
+    robot::intake->dump();
+
+  }else if(robot::controller->getDigital(okapi::ControllerDigital::right)){
+    robot::intake->runBField(0b00000101);
+
+  }else{
+    robot::intake->idle();
+
+  }
+}
 
 void opcontrol() {
   auto buttonA = (*robot::controller)[okapi::ControllerDigital::A];
@@ -52,31 +79,7 @@ void opcontrol() {
 
       controllerSetText(&t, 0, 0, "STD       ");
 
-      if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
-        robot::intake->runAll();
-      }else{
-
-        if(robot::controller->getDigital(okapi::ControllerDigital::R1)){
-          robot::intake->intake();
-        }else{
-
-          if(robot::controller->getDigital(okapi::ControllerDigital::L2)){
-            robot::intake->outtake();
-          }else{
-
-            if(robot::controller->getDigital(okapi::ControllerDigital::Y)){
-              robot::intake->dump();
-            }else{
-
-              if(robot::controller->getDigital(okapi::ControllerDigital::right)){
-                robot::intake->runBField(0b00000101);
-              }else{
-                robot::intake->idle();
-              }
-            }
-          }
-        }
-      }
+      intakeControl();
 
       robot::chassis->set({
         robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftY),
@@ -92,31 +95,7 @@ void opcontrol() {
 
       controllerSetText(&t, 0, 0, "Smrt" + std::to_string(headingController->getTarget()) + "   ");
 
-      if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
-        robot::intake->runAll();
-      }else{
-
-        if(robot::controller->getDigital(okapi::ControllerDigital::R1)){
-          robot::intake->intake();
-        }else{
-
-          if(robot::controller->getDigital(okapi::ControllerDigital::L2)){
-            robot::intake->outtake();
-          }else{
-
-            if(robot::controller->getDigital(okapi::ControllerDigital::Y)){
-              robot::intake->dump();
-            }else{
-
-              if(robot::controller->getDigital(okapi::ControllerDigital::right)){
-                robot::intake->runBField(0b00000101);
-              }else{
-                robot::intake->idle();
-              }
-            }
-          }
-        }
-      }
+      intakeControl();
 
       headingController->setTarget(headingController->getTarget() - robot::maxAngularSpeed * deadzone(robot::controller->getAnalog(okapi::ControllerAnalog::rightX), 0.1) * 0.01 * 180 / M_PI);
 
@@ -134,36 +113,7 @@ void opcontrol() {
 
       controllerSetText(&t, 0, 0, "FCentric" + std::to_string(headingController->getTarget()) + "   ");
 
-      if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
-        robot::intake->runAll();
-      }else{
-
-        if(robot::controller->getDigital(okapi::ControllerDigital::R1)){
-          robot::intake->runBField(0b11111100);
-        }else{
-
-          if(robot::controller->getDigital(okapi::ControllerDigital::R2)){
-            robot::intake->intake();
-          }else{
-
-            if(robot::controller->getDigital(okapi::ControllerDigital::L2)){
-              robot::intake->outtake();
-            }else{
-
-              if(robot::controller->getDigital(okapi::ControllerDigital::Y)){
-                robot::intake->dump();
-              }else{
-
-                if(robot::controller->getDigital(okapi::ControllerDigital::right)){
-                  robot::intake->runBField(0b00000101);
-                }else{
-                  robot::intake->idle();
-                }
-              }
-            }
-          }
-        }
-      }
+      intakeControl();
 
       headingController->setTarget(headingController->getTarget() - robot::maxAngularSpeed * deadzone(robot::controller->getAnalog(okapi::ControllerAnalog::rightX), 0.1) * 0.01 * 180 / M_PI);
 

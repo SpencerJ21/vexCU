@@ -55,8 +55,11 @@ void initialize(){
   );
 
   robot::poseController = std::make_shared<HoloPoseController>(
-    std::make_unique<kappa::PidController>(kappa::PidController::Gains{4,0,4,0}, okapi::TimeUtilFactory::withSettledUtilParams(1, 5,  10 * okapi::millisecond)),
-    std::make_unique<kappa::PidController>(kappa::PidController::Gains{6,0,6,0}, okapi::TimeUtilFactory::withSettledUtilParams(3, 10, 10 * okapi::millisecond))
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{4,0,4,0},
+      okapi::TimeUtilFactory::withSettledUtilParams(1, 5,  10 * okapi::millisecond)),
+      
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{6,0,6,0},
+      okapi::TimeUtilFactory::withSettledUtilParams(3, 10, 10 * okapi::millisecond))
   );
 
   robot::imu->calibrate();
