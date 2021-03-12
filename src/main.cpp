@@ -50,16 +50,6 @@ void opcontrol() {
 
   auto headingController = std::make_shared<kappa::PidController>(kappa::PidController::Gains{0.1,0,0.1,0});
 
-  pros::Task odomTask([&]{
-		auto t = pros::millis();
-
-		while(true){
-			robot::odometry->step();
-
-			pros::Task::delay_until(&t, 10);
-		}
-	}, "Odom Task");
-
   pros::Task logTask([&]{
     while(true){
       auto pose = robot::odometry->get();
@@ -81,28 +71,10 @@ void opcontrol() {
 
       intakeControl();
 
-      robot::chassis->set({
+      robot::driverChassis->set({
         robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftY),
        -robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftX),
        -robot::maxAngularSpeed * robot::controller->getAnalog(okapi::ControllerAnalog::rightX)
-      });
-
-      pros::delay(10);
-
-    }
-
-    while(!buttonA.changedToPressed()){
-
-      controllerSetText(&t, 0, 0, "Smrt" + std::to_string(headingController->getTarget()) + "   ");
-
-      intakeControl();
-
-      headingController->setTarget(headingController->getTarget() - robot::maxAngularSpeed * deadzone(robot::controller->getAnalog(okapi::ControllerAnalog::rightX), 0.1) * 0.01 * 180 / M_PI);
-
-      robot::chassis->set({
-        robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftY),
-       -robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftX),
-        deadzone(headingController->step(robot::imu->get()), 0.1)
       });
 
       pros::delay(10);
@@ -131,7 +103,7 @@ void opcontrol() {
 
       controllerSetText(&t, 0, 0, "Auto       ");
 
-      robot::slewChassis->set(robot::poseController->step(robot::odometry->get()));
+      autonomous();
 
       pros::delay(10);
     }

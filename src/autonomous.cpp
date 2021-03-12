@@ -2,48 +2,38 @@
 #include "robot.hpp"
 
 inline void chassisWait(){
-  while(!robot::poseController->isSettled()){
+  do{
     robot::slewChassis->set(robot::poseController->step(robot::odometry->get()));
     pros::delay(10);
-  }
+  }while(!robot::poseController->isSettled());
 }
 
 
 void autonomous() {
 
-  pros::Task odomTask([&]{
-    auto t = pros::millis();
+  robot::poseController->setTarget({4, 0, 0, 0, 0, 0});
 
-    while(true){
-      robot::odometry->step();
-
-      pros::Task::delay_until(&t, 10);
-    }
-  }, "Odom Task");
-
-  robot::intake->runBField(0b01010000);
-  pros::delay(300);
+  robot::intake->runBField(0b00001000);
+  pros::delay(500);
 
   robot::intake->intake();
 
   robot::poseController->setStopping(false);
-  robot::poseController->setTarget({34, 16, M_PI_2, 0, 0, 0});
-  pros::delay(1500);
-
-  robot::intake->runBField(0b11111100);
+  robot::poseController->setTarget({30, 5, M_PI_2, 0, 0, 0});
   chassisWait();
 
   robot::poseController->setStopping(true);
-  robot::poseController->setTarget({34, 20, M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({30, 14, M_PI_2, 0, 0, 0});
   chassisWait();
+  pros::delay(1000);
 
   robot::intake->idle();
   robot::poseController->setStopping(false);
-  robot::poseController->setTarget({18, 18, M_PI_2 + M_PI_4, 0, 0, 0});
+  robot::poseController->setTarget({22, 12, M_PI_2 + M_PI_4, 0, 0, 0});
   chassisWait();
 
   robot::poseController->setStopping(true);
-  robot::poseController->setTarget({15, 21, M_PI_2 + M_PI_4, 0, 0, 0});
+  robot::poseController->setTarget({18, 15, M_PI_2 + M_PI_4, 0, 0, 0});
   chassisWait();
 
   robot::intake->runAll();
@@ -51,7 +41,7 @@ void autonomous() {
 
   robot::intake->dump();
   robot::poseController->setStopping(false);
-  robot::poseController->setTarget({36, 0, M_PI_2 + M_PI_4, 0, 0, 0});
+  robot::poseController->setTarget({36, -12, M_PI_2, 0, 0, 0});
   chassisWait();
 
   robot::intake->intake();
@@ -60,11 +50,11 @@ void autonomous() {
   chassisWait();
 
   robot::poseController->setStopping(false);
-  robot::poseController->setTarget({72, -6, M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({70, -6, M_PI_2, 0, 0, 0});
   chassisWait();
 
   robot::poseController->setStopping(true);
-  robot::poseController->setTarget({72, 18, M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({70, 12, M_PI_2, 0, 0, 0});
   chassisWait();
 
   robot::intake->runAll();

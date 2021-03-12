@@ -17,7 +17,7 @@ void Intake::runBField(uint8_t bfield){
 }
 
 void Intake::intake(){
-  runBField(0b10101100);
+  runBField(0b10101000);
 }
 
 void Intake::outtake(){

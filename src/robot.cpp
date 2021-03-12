@@ -3,6 +3,7 @@
 namespace robot {
 
 std::shared_ptr<kappa::XDriveChassis> chassis;
+std::shared_ptr<kappa::XDriveChassis> driverChassis;
 std::shared_ptr<kappa::ImuInput> imu;
 std::shared_ptr<okapi::Controller> controller;
 std::shared_ptr<kappa::AbstractInput<std::array<double,4>>> sensorArray;
@@ -22,6 +23,18 @@ void initialize(){
 
   robot::chassis =
     std::make_shared<kappa::XDriveChassis>(4.2, 17,
+      std::make_shared<kappa::ArrayOutputClamp<double,4>>(-140, 140,
+        std::make_shared<kappa::ArrayDistributor<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractOutput<double>>>{
+          std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(14,  {25,50,50,620})),
+          std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(15,  {25,50,50,620})),
+          std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(-19, {25,50,50,620})),
+          std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(-18,  {25,50,50,620}))
+        })
+      )
+    );
+
+  robot::driverChassis =
+    std::make_shared<kappa::XDriveChassis>(4.2, 17,
       std::make_shared<kappa::ArrayOutputClamp<double,4>>(-220, 220,
         std::make_shared<kappa::ArrayDistributor<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractOutput<double>>>{
           std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(14,  {25,50,50,620})),
@@ -32,7 +45,7 @@ void initialize(){
       )
     );
 
-  robot::slewChassis = std::make_shared<HolonomicSlew>(4, 10, robot::chassis);
+  robot::slewChassis = std::make_shared<HolonomicSlew>(2, 15, robot::chassis);
 
   robot::imu = std::make_shared<kappa::ImuInput>(7);
 
@@ -56,8 +69,8 @@ void initialize(){
 
   robot::poseController = std::make_shared<HoloPoseController>(
     std::make_unique<kappa::PidController>(kappa::PidController::Gains{4,0,4,0},
-      okapi::TimeUtilFactory::withSettledUtilParams(1, 5,  10 * okapi::millisecond)),
-      
+      okapi::TimeUtilFactory::withSettledUtilParams(2, 10, 10 * okapi::millisecond)),
+
     std::make_unique<kappa::PidController>(kappa::PidController::Gains{6,0,6,0},
       okapi::TimeUtilFactory::withSettledUtilParams(3, 10, 10 * okapi::millisecond))
   );
@@ -65,5 +78,16 @@ void initialize(){
   robot::imu->calibrate();
 
   pros::delay(2500);
+
+
+  pros::Task odomTask([&]{
+  	auto t = pros::millis();
+
+  	while(true){
+  		robot::odometry->step();
+
+  		pros::Task::delay_until(&t, 10);
+  	}
+  }, "Odom Task");
 
 }
