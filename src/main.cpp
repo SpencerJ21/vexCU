@@ -27,9 +27,6 @@ void intakeControl(){
   }else if(robot::controller->getDigital(okapi::ControllerDigital::R1)){
     robot::intake->intake();
 
-  }else if(robot::controller->getDigital(okapi::ControllerDigital::R2)){
-    robot::intake->runBField(0b11111100);
-
   }else if(robot::controller->getDigital(okapi::ControllerDigital::L2)){
     robot::intake->outtake();
 
@@ -71,10 +68,12 @@ void opcontrol() {
 
       intakeControl();
 
+      double driveScalar = robot::controller->getDigital(okapi::ControllerDigital::R2) ? 0.5 : 1.0;
+
       robot::driverChassis->set({
-        robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftY),
-       -robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftX),
-       -robot::maxAngularSpeed * robot::controller->getAnalog(okapi::ControllerAnalog::rightX)
+        driveScalar * robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftY),
+       -driveScalar * robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftX),
+       -driveScalar * robot::maxAngularSpeed * robot::controller->getAnalog(okapi::ControllerAnalog::rightX)
       });
 
       pros::delay(10);

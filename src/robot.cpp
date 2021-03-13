@@ -23,7 +23,7 @@ void initialize(){
 
   robot::chassis =
     std::make_shared<kappa::XDriveChassis>(4.2, 17,
-      std::make_shared<kappa::ArrayOutputClamp<double,4>>(-140, 140,
+      std::make_shared<kappa::ArrayOutputClamp<double,4>>(-120, 120,
         std::make_shared<kappa::ArrayDistributor<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractOutput<double>>>{
           std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(14,  {25,50,50,620})),
           std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(15,  {25,50,50,620})),
@@ -56,7 +56,7 @@ void initialize(){
     robot::imu
   });
 
-  robot::intake = std::make_shared<Intake>(3,-2,8,9);
+  robot::intake = std::make_shared<Intake>(3,-2,8,10);
 
   robot::controller = std::make_shared<okapi::Controller>();
 
@@ -68,11 +68,11 @@ void initialize(){
   );
 
   robot::poseController = std::make_shared<HoloPoseController>(
-    std::make_unique<kappa::PidController>(kappa::PidController::Gains{4,0,4,0},
-      okapi::TimeUtilFactory::withSettledUtilParams(2, 10, 10 * okapi::millisecond)),
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{4,0,8,0},
+      okapi::TimeUtilFactory::withSettledUtilParams(3, 0.01, 0 * okapi::millisecond)),
 
     std::make_unique<kappa::PidController>(kappa::PidController::Gains{6,0,6,0},
-      okapi::TimeUtilFactory::withSettledUtilParams(3, 10, 10 * okapi::millisecond))
+      okapi::TimeUtilFactory::withSettledUtilParams(2, 0.01, 0 * okapi::millisecond))
   );
 
   robot::imu->calibrate();
