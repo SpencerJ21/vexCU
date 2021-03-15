@@ -12,11 +12,6 @@ void chassisWait(double timeout){
 
 void autonomous() {
 
-  //robot::poseController->setTarget({6, 0, 0, 0, 0, 0});
-
-  //robot::intake->runBField(0b00001000);
-  //pros::delay(500);
-
   robot::intake->intake();
   robot::poseController->setTarget({31, 5, M_PI_2, 0, 0, 0});
   chassisWait(5000);
@@ -49,25 +44,21 @@ void autonomous() {
   robot::poseController->setTarget({70, -12, M_PI_2, 0, 0, 0});
   chassisWait(5000);
 
-  //robot::poseController->setStopping(true);
   robot::poseController->setTarget({70, 10, M_PI_2, 0, 0, 0});
   chassisWait(3000);
 
   robot::intake->runAll();
   pros::delay(1200);
 
-  //robot::poseController->setStopping(true);
   robot::poseController->setTarget({70, 0, M_PI_2, 0, 0, 0});
   pros::delay(500);
 
   robot::intake->dump();
   chassisWait(3000);
 
-  //robot::poseController->setStopping(false);
   robot::poseController->setTarget({103, 5, M_PI_2, 0, 0, 0});
   chassisWait(5000);
 
-  //robot::poseController->setStopping(true);
   robot::intake->intake();
   robot::poseController->setTarget({103, 14, M_PI_2, 0, 0, 0});
   chassisWait(5000);

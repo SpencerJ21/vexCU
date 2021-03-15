@@ -1,5 +1,7 @@
 #include "robot.hpp"
 
+extern void screenTaskFn();
+
 namespace robot {
 
 std::shared_ptr<kappa::XDriveChassis> chassis;
@@ -89,5 +91,9 @@ void initialize(){
   		pros::Task::delay_until(&t, 10);
   	}
   }, "Odom Task");
+
+  pros::Task screenTask([&]{
+    screenTaskFn();
+  }, "Screen Task");
 
 }
