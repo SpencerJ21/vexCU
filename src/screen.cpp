@@ -93,10 +93,10 @@ void screenTaskFn(){
 
   while(true){
     auto robotPos = robot::odometry->get();
-    lv_obj_set_pos(robotLed, ((robotPos.x + 1) * 5.0/3.0) - lv_obj_get_width(robotLed)/2, ((robotPos.y - 18)* -5.0/3.0) - lv_obj_get_height(robotLed)/2 - 1);
+    lv_obj_set_pos(robotLed, ((robotPos.x + 1) * 5.0/3.0) - (double)lv_obj_get_width(robotLed)/2, ((robotPos.y - 18) * -5.0/3.0) - (double)lv_obj_get_height(robotLed)/2 - 1);
 
     auto targetPos = robot::poseController->getTarget();
-    lv_obj_set_pos(targetLed, ((targetPos.x + 1) * 5.0/3.0) - lv_obj_get_width(targetLed)/2, ((targetPos.y - 18)* -5.0/3.0) - lv_obj_get_height(targetLed)/2 - 1);
+    lv_obj_set_pos(targetLed, ((targetPos.x + 1) * 5.0/3.0) - lv_obj_get_width(targetLed)/2, ((targetPos.y - 18) * -5.0/3.0) - lv_obj_get_height(targetLed)/2 - 1);
 
     linePoints[0] = {(int16_t)((robotPos.x + 1) * 5.0/3.0), (int16_t)(((robotPos.x + 1) * 5.0/3.0) - 1.5)};
     double dirY = 30 * cos(robotPos.theta);
