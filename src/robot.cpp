@@ -58,7 +58,7 @@ void initialize(){
     robot::imu
   });
 
-  robot::intake = std::make_shared<Intake>(3,-2,8,10);
+  robot::intake = std::make_shared<Intake>(3,-2,8,10,2);
 
   robot::controller = std::make_shared<okapi::Controller>();
 
@@ -77,10 +77,12 @@ void initialize(){
       okapi::TimeUtilFactory::withSettledUtilParams(2, 0.01, 0 * okapi::millisecond))
   );
 
+  auto calibrationTime = pros::millis();
+
   robot::imu->calibrate();
+  robot::intake->calibrateSensor(0.5, 0.8);
 
-  pros::delay(2500);
-
+  pros::Task::delay_until(&calibrationTime, 2500);
 
   pros::Task odomTask([&]{
   	auto t = pros::millis();
