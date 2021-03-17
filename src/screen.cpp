@@ -15,9 +15,11 @@ void screenTaskFn(){
   lv_obj_t *scr = lv_obj_create(NULL, NULL);
   lv_scr_load(scr);
 
+  auto themeColor = LV_COLOR_MAKE(0xfc, 0x03, 0xff);
+
   lv_style_copy(&scrStyle, &lv_style_plain_color);
-  scrStyle.body.main_color = LV_COLOR_BLUE;
-  scrStyle.body.grad_color = LV_COLOR_BLUE;
+  scrStyle.body.main_color = themeColor;
+  scrStyle.body.grad_color = themeColor;
   scrStyle.body.border.width = 0;
   scrStyle.body.radius = 0;
   lv_obj_set_style(scr, &scrStyle);
@@ -47,28 +49,27 @@ void screenTaskFn(){
     }
   }
 
-  lv_obj_t *robotLed = lv_led_create(field, NULL);
-  lv_led_on(robotLed);
-  lv_obj_set_size(robotLed, 16, 16);
-
-  lv_style_copy(&ledStyle, &lv_style_plain);
-  ledStyle.body.radius = LV_RADIUS_CIRCLE;
-  ledStyle.body.main_color = LV_COLOR_BLUE;
-  ledStyle.body.grad_color = LV_COLOR_BLUE;
-  ledStyle.body.border.color = LV_COLOR_WHITE;
-  ledStyle.body.border.width = 2;
-  ledStyle.body.border.opa = LV_OPA_100;
-  lv_obj_set_style(robotLed, &ledStyle);
-
   lv_obj_t *targetLed = lv_led_create(field, NULL);
   lv_led_on(targetLed);
   lv_obj_set_size(targetLed, 16, 16);
 
-  lv_style_copy(&targetStyle, &ledStyle);
-  targetStyle.body.main_color = LV_COLOR_RED;
-  targetStyle.body.grad_color = LV_COLOR_RED;
+  lv_style_copy(&targetStyle, &lv_style_plain);
+  targetStyle.body.radius = LV_RADIUS_CIRCLE;
+  targetStyle.body.border.color = LV_COLOR_WHITE;
+  targetStyle.body.border.width = 2;
+  targetStyle.body.border.opa = LV_OPA_100;
+  targetStyle.body.main_color = LV_COLOR_MAKE(0xff, 0xff, 0x03);
+  targetStyle.body.grad_color = LV_COLOR_MAKE(0xff, 0xff, 0x03);
   lv_obj_set_style(targetLed, &targetStyle);
 
+  lv_obj_t *robotLed = lv_led_create(field, NULL);
+  lv_led_on(robotLed);
+  lv_obj_set_size(robotLed, 16, 16);
+
+  lv_style_copy(&ledStyle, &targetStyle);
+  ledStyle.body.main_color = themeColor;
+  ledStyle.body.grad_color = themeColor;
+  lv_obj_set_style(robotLed, &ledStyle);
 
   std::vector<lv_point_t> linePoints = {{0, 0}, {0, 0}};
 
@@ -79,7 +80,7 @@ void screenTaskFn(){
   lv_style_copy(&lineStyle, &lv_style_plain);
   lineStyle.line.width = 3;
   lineStyle.line.opa = LV_OPA_100;
-  lineStyle.line.color = LV_COLOR_BLUE;
+  lineStyle.line.color = themeColor;
   lv_obj_set_style(robotLine, &lineStyle);
 
 
@@ -98,9 +99,9 @@ void screenTaskFn(){
     auto targetPos = robot::poseController->getTarget();
     lv_obj_set_pos(targetLed, ((targetPos.x + 1) * 5.0/3.0) - (double)lv_obj_get_width(targetLed)/2, ((targetPos.y - 18) * -5.0/3.0) - (double)lv_obj_get_height(targetLed)/2 - 1);
 
-    linePoints[0] = {(int16_t)((robotPos.x + 1) * 5.0/3.0), (int16_t)(((robotPos.x + 1) * 5.0/3.0) - 1.5)};
-    double dirY = 30 * cos(robotPos.theta);
-    double dirX = 30 * sin(robotPos.theta);
+    linePoints[0] = {(int16_t)((robotPos.x + 1) * 5.0/3.0), (int16_t)(((robotPos.y - 18) * -5.0/3.0) - 1.5)};
+    double dirY = 30 * sin(robotPos.theta);
+    double dirX = 30 * cos(robotPos.theta);
     linePoints[1] = {(int16_t)(dirX + linePoints[0].x), (int16_t)(-dirY + linePoints[0].y)};
     lv_line_set_points(robotLine, linePoints.data(), linePoints.size());
     lv_obj_invalidate(robotLine);

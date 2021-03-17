@@ -20,28 +20,6 @@ std::int32_t controllerSetText(uint32_t *t, std::uint8_t iline, std::uint8_t ico
   }
 }
 
-void intakeControl(){
-  if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
-    robot::intake->runAll();
-
-  }else if(robot::controller->getDigital(okapi::ControllerDigital::R1)){
-    robot::intake->intake();
-
-  }else if(robot::controller->getDigital(okapi::ControllerDigital::L2)){
-    robot::intake->outtake();
-
-  }else if(robot::controller->getDigital(okapi::ControllerDigital::Y)){
-    robot::intake->dump();
-
-  }else if(robot::controller->getDigital(okapi::ControllerDigital::right)){
-    robot::intake->runBField(0b00000101);
-
-  }else{
-    robot::intake->idle();
-
-  }
-}
-
 void opcontrol() {
   auto buttonA = (*robot::controller)[okapi::ControllerDigital::A];
 
@@ -58,53 +36,45 @@ void opcontrol() {
     }
   }, "Log Task");
 
-  uint32_t t = pros::millis();
+  uint32_t startTime = pros::millis();
+
+  uint32_t t = startTime;
 
   while(true){
 
-    while(!buttonA.changedToPressed()){
+    controllerSetText(&t, 0, 0, "STD       ");
 
-      controllerSetText(&t, 0, 0, "STD       ");
+    if(robot::controller->getDigital(okapi::ControllerDigital::up) || startTime + 500 > pros::millis()){
+      robot::intake->runBField(0b01010000);
+      
+    }else if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
+      robot::intake->runAll();
 
-      intakeControl();
+    }else if(robot::controller->getDigital(okapi::ControllerDigital::R1)){
+      robot::intake->intake();
 
-      double driveScalar = robot::controller->getDigital(okapi::ControllerDigital::R2) ? 0.5 : 1.0;
+    }else if(robot::controller->getDigital(okapi::ControllerDigital::L2)){
+      robot::intake->outtake();
 
-      robot::driverChassis->set({
-        driveScalar * robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftY),
-       -driveScalar * robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftX),
-       -driveScalar * robot::maxAngularSpeed * robot::controller->getAnalog(okapi::ControllerAnalog::rightX)
-      });
+    }else if(robot::controller->getDigital(okapi::ControllerDigital::Y)){
+      robot::intake->dump();
 
-      pros::delay(10);
+    }else if(robot::controller->getDigital(okapi::ControllerDigital::right)){
+      robot::intake->runBField(0b00000101);
 
-    }
-
-    while(!buttonA.changedToPressed()){
-
-      controllerSetText(&t, 0, 0, "FCentric" + std::to_string(headingController->getTarget()) + "   ");
-
-      intakeControl();
-
-      headingController->setTarget(headingController->getTarget() - robot::maxAngularSpeed * deadzone(robot::controller->getAnalog(okapi::ControllerAnalog::rightX), 0.1) * 0.01 * 180 / M_PI);
-
-      robot::slewChassis->set({
-        robot::maxLinearSpeed * sqrt(pow(robot::controller->getAnalog(okapi::ControllerAnalog::leftX), 2) + pow(robot::controller->getAnalog(okapi::ControllerAnalog::leftY), 2)),
-        std::atan2(-robot::controller->getAnalog(okapi::ControllerAnalog::leftX), robot::controller->getAnalog(okapi::ControllerAnalog::leftY)) - M_PI / 180 * robot::imu->get(),
-        deadzone(headingController->step(robot::imu->get()), 0.1)
-      });
-
-      pros::delay(10);
+    }else{
+      robot::intake->idle();
 
     }
 
-    while(!robot::poseController->isSettled()){
+    double driveScalar = robot::controller->getDigital(okapi::ControllerDigital::R2) ? 0.5 : 1.0;
 
-      controllerSetText(&t, 0, 0, "Auto       ");
+    robot::driverChassis->set({
+      driveScalar * robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftY),
+     -driveScalar * robot::maxLinearSpeed  * robot::controller->getAnalog(okapi::ControllerAnalog::leftX),
+     -driveScalar * robot::maxAngularSpeed * robot::controller->getAnalog(okapi::ControllerAnalog::rightX)
+    });
 
-      autonomous();
-
-      pros::delay(10);
-    }
+    pros::delay(10);
   }
 }
