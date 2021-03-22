@@ -5,12 +5,6 @@ void disabled() {}
 
 void competition_initialize() {}
 
-
-
-inline double deadzone(double val, double threshold){
-  return std::abs(val) > threshold ? val : 0;
-}
-
 std::int32_t controllerSetText(uint32_t *t, std::uint8_t iline, std::uint8_t icol, std::string itext){
   if(pros::millis() - 50 < *t){
     return 1;
