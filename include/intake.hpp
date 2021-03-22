@@ -13,6 +13,8 @@ public:
 
   void waitForBall(uint8_t numberOfBalls, uint32_t timeout);
 
+  int32_t getSensorValue();
+
   void runBField(uint8_t bfield);
 
   void intake();

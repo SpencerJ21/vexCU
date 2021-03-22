@@ -49,6 +49,10 @@ void Intake::waitForBall(uint8_t numberOfBalls, uint32_t timeout){
   }
 }
 
+int32_t Intake::getSensorValue(){
+  return ballSensor.get_value();
+}
+
 void Intake::runBField(uint8_t bfield){
   intakeL.moveVoltage(voltage[(bfield & 0b11000000) >> 6]);
   intakeR.moveVoltage(voltage[(bfield & 0b00110000) >> 4]);

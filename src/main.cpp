@@ -28,7 +28,7 @@ void opcontrol() {
   pros::Task logTask([&]{
     while(true){
       auto pose = robot::odometry->get();
-      std::cout << "(" << pose.x << ", " << pose.y << ", " << pose.theta << ")\n";
+      std::cout << "(" << pose.x << ", " << pose.y << ", " << pose.theta << ")\tS=" << robot::intake->getSensorValue() << "\n";
 
       //auto data = robot::sensorArray->get();
       //std::cout << data[0] << ", " << data[0] << ", " << data[0] << ", " << data[0] << "\n";
@@ -46,7 +46,7 @@ void opcontrol() {
 
     if(robot::controller->getDigital(okapi::ControllerDigital::up) || startTime + 500 > pros::millis()){
       robot::intake->runBField(0b01010000);
-      
+
     }else if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
       robot::intake->runAll();
 
