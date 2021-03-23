@@ -25,7 +25,7 @@ void initialize(){
 
   robot::chassis =
     std::make_shared<kappa::XDriveChassis>(4.2, 17,
-      std::make_shared<kappa::ArrayOutputClamp<double,4>>(-120, 120,
+      std::make_shared<kappa::ArrayOutputClamp<double,4>>(-210, 210,
         std::make_shared<kappa::ArrayDistributor<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractOutput<double>>>{
           std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(14,  {25,50,50,620})),
           std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(15,  {25,50,50,620})),
@@ -35,19 +35,8 @@ void initialize(){
       )
     );
 
-  robot::driverChassis =
-    std::make_shared<kappa::XDriveChassis>(4.2, 17,
-      std::make_shared<kappa::ArrayOutputClamp<double,4>>(-220, 220,
-        std::make_shared<kappa::ArrayDistributor<double,4>>(std::initializer_list<std::shared_ptr<kappa::AbstractOutput<double>>>{
-          std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(14,  {25,50,50,620})),
-          std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(15,  {25,50,50,620})),
-          std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(-19, {25,50,50,620})),
-          std::make_shared<kappa::VPidSubController>(kappa::makeVPIDMotor(-18,  {25,50,50,620}))
-        })
-      )
-    );
 
-  robot::slewChassis = std::make_shared<HolonomicSlew>(2, 15, robot::chassis);
+  robot::slewChassis = std::make_shared<HolonomicSlew>(2, 1000, robot::chassis);
 
   robot::imu = std::make_shared<kappa::ImuInput>(7);
 
@@ -70,12 +59,14 @@ void initialize(){
   );
 
   robot::poseController = std::make_shared<HoloPoseController>(
-    std::make_unique<kappa::PidController>(kappa::PidController::Gains{4,0,8,0},
-      okapi::TimeUtilFactory::withSettledUtilParams(3, 0.01, 0 * okapi::millisecond)),
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{10,0,40,0},
+      okapi::TimeUtilFactory::withSettledUtilParams(1.5, 0.7, 10 * okapi::millisecond)),
 
-    std::make_unique<kappa::PidController>(kappa::PidController::Gains{6,0,6,0},
-      okapi::TimeUtilFactory::withSettledUtilParams(2, 0.01, 0 * okapi::millisecond))
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{12,0,60,0},
+      okapi::TimeUtilFactory::withSettledUtilParams(0.2, 0.05, 10 * okapi::millisecond))
   );
+
+  robot::poseController->setOutputLimits({-0.1*robot::maxLinearSpeed, 0, -0.1*robot::maxAngularSpeed}, {0.1*robot::maxLinearSpeed, 0, 0.1*robot::maxAngularSpeed});
 
   auto calibrationTime = pros::millis();
 

@@ -10,7 +10,6 @@
 namespace robot {
 
 extern std::shared_ptr<kappa::XDriveChassis> chassis;
-extern std::shared_ptr<kappa::XDriveChassis> driverChassis;
 extern std::shared_ptr<kappa::ImuInput> imu;
 extern std::shared_ptr<okapi::Controller> controller;
 extern std::shared_ptr<kappa::AbstractInput<std::array<double,4>>> sensorArray;

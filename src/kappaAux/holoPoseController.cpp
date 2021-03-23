@@ -16,6 +16,9 @@ void HoloPoseController::setTarget(const Pose &itarget) {
 void HoloPoseController::setOutputLimits(std::tuple<double,double,double> imin, std::tuple<double,double,double> imax) {
   outputMin = imin;
   outputMax = imax;
+
+  linearController->setOutputLimits(std::get<0>(imin), std::get<0>(imax));
+  angularController->setOutputLimits(std::get<2>(imin), std::get<2>(imax));
 }
 
 std::tuple<double,double,double> HoloPoseController::getMinOutput() const {
@@ -37,9 +40,9 @@ std::tuple<double,double,double> HoloPoseController::step(Pose ireading){
   distance = sqrt(dy * dy + dx * dx);
 
   return {
-    std::clamp(linearController->step(distance), std::get<0>(outputMin), std::get<0>(outputMax)),
+    linearController->step(-distance),
     atan2(dy,dx) - ireading.theta,
-    std::clamp(angularController->step(ireading.theta), std::get<2>(outputMin), std::get<2>(outputMax))
+    angularController->step(ireading.theta)
   };
 }
 

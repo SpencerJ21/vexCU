@@ -1,16 +1,35 @@
 #include "main.h"
 #include "robot.hpp"
 
+uint16_t chassisMoveId = 0;
+
 void chassisWait(double timeout){
   double t = pros::millis() + timeout;
+
   do{
-    robot::slewChassis->set(robot::poseController->step(robot::odometry->get()));
-    pros::delay(10);
+    pros::delay(100);
   }while(!robot::poseController->isSettled() && pros::millis() < t);
+
+  std::cout << "Move:  " << chassisMoveId++ << "\t" << pros::millis() + timeout - t << "\n";
 }
 
 
 void autonomous() {
+
+  pros::Task chassisThread([&]{
+    while(true){
+      while(!robot::poseController->isSettled()){
+        robot::slewChassis->set(robot::poseController->step(robot::odometry->get()));
+        pros::delay(10);
+      }
+
+      while(robot::poseController->isSettled()){
+        robot::poseController->step(robot::odometry->get());
+        robot::slewChassis->set({0,0,0});
+        pros::delay(10);
+      }
+    }
+  }, "Auton Chassis Runner");
 
   // deploy
   robot::intake->runBField(0b01010000);
@@ -189,11 +208,14 @@ void autonomous() {
   robot::intake->waitForBall(1, 3000);
 
   // ML Goal
-  robot::poseController->setTarget({24, -36, M_PI, 0, 0, 0});
+  robot::poseController->setTarget({32, -36, M_PI, 0, 0, 0});
   chassisWait(5000);
 
-  robot::intake->outtake();
-  pros::delay(1000);
+  robot::poseController->setTarget({24, -36, M_PI, 0, 0, 0});
+  chassisWait(3000);
+
+  robot::intake->runAll();
+  robot::intake->waitForBall(1, 2000);
 
   // Retreat
   robot::intake->dump();
@@ -237,6 +259,10 @@ void autonomous() {
   robot::poseController->setTarget({34, -36, 0, 0, 0, 0});
   chassisWait(2000);
 
-  robot::chassis->set({0,0,0});
-  robot::intake->idle();
+
+  // stop
+  while(true){
+    robot::chassis->set({0,0,0});
+    robot::intake->idle();
+  }
 }
