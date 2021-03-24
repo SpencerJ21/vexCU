@@ -133,6 +133,8 @@ void autonomous() {
   robot::intake->runAll();
   robot::intake->waitForBall(2, 3000);
 
+//========================= NEEDS POSITION RETUNING ============================
+
   // retreat and dump
   endPushAgainstGoal();
   robot::poseController->setTarget({100, 0, M_PI_4, 0, 0, 0});
@@ -149,16 +151,15 @@ void autonomous() {
 
   // MR goal
   robot::intake->idle();
-  robot::poseController->setTarget({102, -36, 0, 0, 0, 0});
-  chassisWait(3000);
-
   robot::poseController->setTarget({114, -36, 0, 0, 0, 0});
   chassisWait(3000);
 
+  startPushAgainstGoal();
   robot::intake->runAll();
   robot::intake->waitForBall(1, 2000);
 
   //retreat and dump
+  endPushAgainstGoal();
   robot::poseController->setTarget({102, -36, M_PI_4, 0, 0, 0});
   robot::intake->dump();
   chassisWait(3000);
@@ -173,15 +174,22 @@ void autonomous() {
   robot::intake->waitForBall(1, 2000);
 
   // FR goal
-  robot::intake->idle();
   robot::poseController->setTarget({112, -83, -M_PI_4, 0, 0, 0});
   chassisWait(5000);
 
+  robot::intake->idle();
   robot::poseController->setTarget({116, -89, -M_PI_4, 0, 0, 0});
   chassisWait(3000);
 
+  startPushAgainstGoal();
   robot::intake->runAll();
   robot::intake->waitForBall(2, 3000);
+
+  // Dump and retreat
+  endPushAgainstGoal();
+  robot::intake->dump();
+  robot::poseController->setTarget({100, -72, -M_PI_4, 0, 0, 0});
+  chassisWait(3000);
 
   // C4 ball
   robot::intake->intake();
@@ -199,10 +207,12 @@ void autonomous() {
   robot::poseController->setTarget({70, -82, -M_PI_2, 0, 0, 0});
   chassisWait(3000);
 
+  startPushAgainstGoal();
   robot::intake->runAll();
   robot::intake->waitForBall(1, 2000);
 
   // Retreat and dump
+  endPushAgainstGoal();
   robot::poseController->setTarget({70, -70, -M_PI_2, 0, 0, 0});
   robot::intake->dump();
   chassisWait(3000);
@@ -223,10 +233,12 @@ void autonomous() {
   robot::poseController->setTarget({17.5, -87, -M_PI_2 - M_PI_4, 0, 0, 0});
   chassisWait(3000);
 
+  startPushAgainstGoal();
   robot::intake->runAll();
   robot::intake->waitForBall(2, 3000);
 
   // Retreat and dump
+  endPushAgainstGoal();
   robot::intake->dump();
   robot::poseController->setTarget({22, -84, -M_PI_2 - M_PI_4, 0, 0, 0});
   chassisWait(1000);
@@ -246,10 +258,12 @@ void autonomous() {
   robot::poseController->setTarget({24, -36, M_PI, 0, 0, 0});
   chassisWait(3000);
 
+  startPushAgainstGoal();
   robot::intake->runAll();
   robot::intake->waitForBall(1, 2000);
 
   // Retreat
+  endPushAgainstGoal();
   robot::intake->dump();
   robot::poseController->setTarget({36, -36, M_PI, 0, 0, 0});
   chassisWait(3000);
@@ -265,7 +279,7 @@ void autonomous() {
   // Descore mid
   robot::poseController->setTarget({42, -32, 0, 0, 0, 0});
   chassisWait(1000);
-
+//maybe use manual push control here?
   robot::poseController->setTarget({36, -32, 0, 0, 0, 0});
   chassisWait(1000);
 
