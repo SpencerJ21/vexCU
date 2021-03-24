@@ -13,7 +13,8 @@ struct Pose {
 
 class Odom3EncImu : public kappa::ComputationalInput<Pose> {
 public:
-  Odom3EncImu(std::unique_ptr<okapi::Filter> itanVelFilter,
+  Odom3EncImu(double irearOffset,
+              std::unique_ptr<okapi::Filter> itanVelFilter,
               std::unique_ptr<okapi::Filter> ilatVelFilter,
               std::unique_ptr<okapi::Filter> iangVelFilter,
               std::shared_ptr<kappa::AbstractInput<std::array<double,4>>> iinput); // left, back, right, imu (positive dir front;left;ccw)
@@ -27,6 +28,8 @@ protected:
   std::unique_ptr<okapi::Filter> tanVelFilter;
   std::unique_ptr<okapi::Filter> stfVelFilter;
   std::unique_ptr<okapi::Filter> angVelFilter;
+
+  double rearOffset{0};
 
   Pose pose{0,0,0,0,0,0};
 

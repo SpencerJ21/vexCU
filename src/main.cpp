@@ -39,7 +39,7 @@ void opcontrol() {
     controllerSetText(&t, 0, 0, "STD       ");
 
     if(robot::controller->getDigital(okapi::ControllerDigital::up) || startTime + 500 > pros::millis()){
-      robot::intake->runBField(0b01010000);
+      robot::intake->runBField(0b01111000);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
       robot::intake->runAll();

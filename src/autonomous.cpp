@@ -31,78 +31,110 @@ void autonomous() {
     }
   }, "Auton Chassis Runner");
 
+  pros::Task logTask([&]{
+    while(true){
+      auto pose = robot::odometry->get();
+      std::cout << "(" << pose.x << ", " << pose.y << ", " << pose.theta << ")\n";
+
+      //auto data = robot::sensorArray->get();
+      //std::cout << data[0] << ", " << data[0] << ", " << data[0] << ", " << data[0] << "\n";
+      pros::delay(100);
+    }
+  }, "Log Task");
+
+  auto startPushAgainstGoal = [&]{
+    chassisThread.suspend();
+
+    robot::chassis->set({20, 0, 0});
+  };
+
+  auto endPushAgainstGoal = [&]{
+    chassisThread.resume();
+  };
+
   // deploy
-  robot::intake->runBField(0b01010000);
+  robot::intake->runBField(0b01111000);
   pros::delay(500);
 
   // B1 ball
   robot::intake->intake();
-  robot::poseController->setTarget({31, 5, M_PI_2, 0, 0, 0});
+  robot::intake->waitForBall(1, 1000);
+
+  robot::poseController->setTarget({26, 12, M_PI_2, 0, 0, 0});
   chassisWait(5000);
 
-  robot::poseController->setTarget({31, 14, M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({26, 19, M_PI_2, 0, 0, 0});
   robot::intake->waitForBall(1, 3000);
 
   // BL goal
   robot::intake->idle();
-  robot::poseController->setTarget({22, 12, M_PI_2 + M_PI_4, 0, 0, 0});
+  robot::poseController->setTarget({13, 12, M_PI_2 + M_PI_4, 0, 0, 0});
   chassisWait(5000);
 
-  robot::poseController->setTarget({17.5, 15, M_PI_2 + M_PI_4, 0, 0, 0});
+  robot::poseController->setTarget({9, 19, M_PI_2 + M_PI_4, 0, 0, 0});
   chassisWait(3000);
 
+  startPushAgainstGoal();
   robot::intake->runAll();
   robot::intake->waitForBall(2, 3000);
 
   // Retreat and dump
+  endPushAgainstGoal();
   robot::intake->dump();
-  robot::poseController->setTarget({36, -20, M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({30, -5, M_PI_2, 0, 0, 0});
   chassisWait(5000);
 
   // C2 ball
   robot::intake->intake();
-  robot::poseController->setTarget({48, -13, 0, 0, 0, 0});
+  robot::poseController->setTarget({36, -12, 0, 0, 0, 0});
   chassisWait(5000);
 
-  robot::poseController->setTarget({54, -13, 0, 0, 0, 0});
+  robot::poseController->setTarget({60, -12, 0, 0, 0, 0});
   chassisWait(5000);
 
   // C1 ball
-  robot::poseController->setTarget({70, -12, M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({62, -12, M_PI_2, 0, 0, 0});
   chassisWait(5000);
 
   // BM goal
-  robot::poseController->setTarget({70, 10, M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({62, 12, M_PI_2, 0, 0, 0});
   chassisWait(3000);
 
+  startPushAgainstGoal();
   robot::intake->runAll();
   robot::intake->waitForBall(1, 2000);
 
+  robot::intake->outtake();
+  pros::delay(500);
+
   // Retreat and dump
-  robot::poseController->setTarget({70, 0, M_PI_2, 0, 0, 0});
+  endPushAgainstGoal();
+  robot::poseController->setTarget({62, 0, M_PI_2, 0, 0, 0});
   robot::intake->dump();
   chassisWait(3000);
 
   // E1 ball
-  robot::poseController->setTarget({103, 5, M_PI_2 + 0.4, 0, 0, 0});
+  robot::poseController->setTarget({97, 8, M_PI_2 + 0.3, 0, 0, 0});
   chassisWait(5000);
 
   robot::intake->intake();
-  robot::poseController->setTarget({103, 14, M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({97, 19, M_PI_2, 0, 0, 0});
   robot::intake->waitForBall(1, 2000);
 
   // BR goal
-  robot::intake->idle();
-  robot::poseController->setTarget({115, 12, M_PI_4, 0, 0, 0});
+  robot::poseController->setTarget({110, 12, M_PI_4, 0, 0, 0});
   chassisWait(5000);
 
-  robot::poseController->setTarget({119, 15, M_PI_4, 0, 0, 0});
+  robot::intake->idle();
+  robot::poseController->setTarget({116, 17, M_PI_4, 0, 0, 0});
   chassisWait(3000);
 
+  startPushAgainstGoal();
   robot::intake->runAll();
   robot::intake->waitForBall(2, 3000);
 
   // retreat and dump
+  endPushAgainstGoal();
   robot::poseController->setTarget({100, 0, M_PI_4, 0, 0, 0});
   robot::intake->dump();
   chassisWait(5000);

@@ -37,5 +37,5 @@ private:
   int32_t detectionThreshold;
   int32_t clearThreshold;
 
-  const int16_t voltage[4]{0, -12000, 12000, 6000};
+  const int16_t voltage[4]{0, -12000, 12000, 4000};
 };

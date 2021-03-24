@@ -52,6 +52,7 @@ void initialize(){
   robot::controller = std::make_shared<okapi::Controller>();
 
   robot::odometry = std::make_shared<Odom3EncImu>(
+    6.0,
     std::make_unique<okapi::PassthroughFilter>(),
     std::make_unique<okapi::PassthroughFilter>(),
     std::make_unique<okapi::PassthroughFilter>(),
@@ -59,14 +60,14 @@ void initialize(){
   );
 
   robot::poseController = std::make_shared<HoloPoseController>(
-    std::make_unique<kappa::PidController>(kappa::PidController::Gains{10,0,40,0},
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{3,0,0,0},
       okapi::TimeUtilFactory::withSettledUtilParams(1.5, 0.7, 10 * okapi::millisecond)),
 
-    std::make_unique<kappa::PidController>(kappa::PidController::Gains{12,0,60,0},
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{5,0,0,0},
       okapi::TimeUtilFactory::withSettledUtilParams(0.2, 0.05, 10 * okapi::millisecond))
   );
 
-  robot::poseController->setOutputLimits({-0.7*robot::maxLinearSpeed, 0, -0.7*robot::maxAngularSpeed}, {0.7*robot::maxLinearSpeed, 0, 0.7*robot::maxAngularSpeed});
+  robot::poseController->setOutputLimits({-0.6*robot::maxLinearSpeed, 0, -0.6*robot::maxAngularSpeed}, {0.6*robot::maxLinearSpeed, 0, 0.6*robot::maxAngularSpeed});
 
   auto calibrationTime = pros::millis();
 
