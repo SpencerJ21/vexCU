@@ -114,7 +114,7 @@ void autonomous() {
   chassisWait(3000);
 
   // E1 ball
-  robot::poseController->setTarget({97, 8, M_PI_2 + 0.3, 0, 0, 0});
+  robot::poseController->setTarget({97, 8, 2*M_PI/3, 0, 0, 0});
   chassisWait(5000);
 
   robot::intake->intake();
@@ -225,13 +225,13 @@ void autonomous() {
 
   // Retreat and dump
   pushingAgainstGoal = false;
-  robot::poseController->setTarget({62, -75, -2*M_PI/3, 0, 0, 0});
+  robot::poseController->setTarget({62, -75, -M_PI/3, 0, 0, 0});
   robot::intake->dump();
   chassisWait(3000);
 
   // B6 ball
   robot::intake->intake();
-  robot::poseController->setTarget({24, -77, -M_PI_2 + 0.3, 0, 0, 0});
+  robot::poseController->setTarget({24, -77, -M_PI/3, 0, 0, 0});
   chassisWait(5000);
 
   robot::poseController->setTarget({25, -91, -M_PI_2, 0, 0, 0});
