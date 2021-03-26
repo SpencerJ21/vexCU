@@ -4,8 +4,9 @@ class Intake {
 public:
   Intake(std::int8_t iintakeL, std::int8_t iintakeR, std::int8_t iuptake1, std::int8_t iouttake1, std::uint8_t isensor);
 
-  // Blocking; ~1s
-  void calibrateSensor(double detectionThresholdProportion, double clearThresholdProportion);
+  void setThresholds(double idetectionThreshold, double iclearThreshold);
+
+  std::pair<int32_t, int32_t> getThresholds();
 
   bool checkForBall();
 
@@ -37,5 +38,5 @@ private:
   int32_t detectionThreshold;
   int32_t clearThreshold;
 
-  const int16_t voltage[4]{0, -12000, 12000, 4000};
+  const int16_t voltage[4]{0, -12000, 12000, 6000};
 };

@@ -6,39 +6,43 @@ Intake::Intake(std::int8_t iintakeL, std::int8_t iintakeR, std::int8_t iuptake1,
   intakeL.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
   intakeR.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
   uptake1.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
-  outtake1.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+  outtake1.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
 }
 
-void Intake::calibrateSensor(double detectionThresholdProportion, double clearThresholdProportion){
-  double avgValue = 0;
+void Intake::setThresholds(double idetectionThreshold, double iclearThreshold){
+  detectionThreshold = idetectionThreshold;
+  clearThreshold     = iclearThreshold;
+}
 
-  for(uint i = 0; i < 100; i++){
-    avgValue += ballSensor.get_value();
-    pros::delay(10);
-  }
-
-  detectionThreshold = avgValue * detectionThresholdProportion * 0.01;
-  clearThreshold     = avgValue * clearThresholdProportion     * 0.01;
+std::pair<int32_t, int32_t> Intake::getThresholds(){
+  return {clearThreshold, detectionThreshold};
 }
 
 bool Intake::checkForBall(){
+  std::cout << "O\t" << ballSensor.get_value() << "\n";
   return ballSensor.get_value() < detectionThreshold;
 }
 
 bool Intake::checkForClear(){
+  std::cout << "X\t" << ballSensor.get_value() << "\n";
   return ballSensor.get_value() > clearThreshold;
 }
 
 void Intake::waitForBall(uint8_t numberOfBalls, uint32_t timeout){
   uint32_t maxTime = pros::millis() + timeout;
 
-  // assert intake is empty
+  // ensure intake is clear
   while(!checkForClear() && pros::millis() < maxTime){
     pros::delay(10);
   }
 
-  //wait until ball is detected
+  // wait until ball is detected
   while(!checkForBall() && pros::millis() < maxTime){
+    pros::delay(10);
+  }
+
+  // wait until ball clears sensor
+  while(!checkForClear() && pros::millis() < maxTime){
     pros::delay(10);
   }
 

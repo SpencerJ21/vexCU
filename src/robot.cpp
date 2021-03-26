@@ -63,7 +63,7 @@ void initialize(){
     std::make_unique<kappa::PidController>(kappa::PidController::Gains{3,0,0,0},
       okapi::TimeUtilFactory::withSettledUtilParams(1.5, 0.7, 10 * okapi::millisecond)),
 
-    std::make_unique<kappa::PidController>(kappa::PidController::Gains{5,0,0,0},
+    std::make_unique<kappa::PidController>(kappa::PidController::Gains{6,0,0,0},
       okapi::TimeUtilFactory::withSettledUtilParams(0.2, 0.05, 10 * okapi::millisecond))
   );
 
@@ -72,7 +72,7 @@ void initialize(){
   auto calibrationTime = pros::millis();
 
   robot::imu->calibrate();
-  robot::intake->calibrateSensor(0.5, 0.8);
+  robot::intake->setThresholds(1900, 2500);
 
   pros::Task::delay_until(&calibrationTime, 2500);
 
