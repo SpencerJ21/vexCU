@@ -26,6 +26,8 @@ public:
    */
   virtual void set(const std::tuple<double,double,double> &itarget) override;
 
+  virtual void stop() override;
+
   /**
    * Gets output
    *

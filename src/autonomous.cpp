@@ -50,11 +50,11 @@ void autonomous() {
   }, "Log Task");
 
   // deploy
-  robot::intake->runBField(0b11110000);
+  robot::intake->runBField(0b10101000);
   pros::delay(500);
 
   // B1 ball
-  robot::intake->runBField(0b10100000);
+  robot::intake->runBField(0b10101101);
   robot::intake->waitForBall(1, 1000);
 
   robot::poseController->setTarget({26, 12, M_PI_2, 0, 0, 0});
@@ -143,10 +143,10 @@ void autonomous() {
 
   // D3 ball
   robot::intake->intake();
-  robot::poseController->setTarget({85, -12, -M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({84, -12, -M_PI_2, 0, 0, 0});
   chassisWait(5000);
 
-  robot::poseController->setTarget({85, -32, -M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({84, -32, -M_PI_2, 0, 0, 0});
   chassisWait(3000);
 
   // MR goal
@@ -256,8 +256,5 @@ void autonomous() {
   chassisWait(5000);
 
   // stop
-  while(true){
-    robot::chassis->set({0,0,0});
-    robot::intake->idle();
-  }
+  robot::chassis->stop();
 }

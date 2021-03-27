@@ -28,6 +28,10 @@ void HolonomicSlew::set(const std::tuple<double,double,double> &itarget){
   chassis->setPolar(out);
 }
 
+void HolonomicSlew::stop(){
+  chassis->stop();
+}
+
 std::shared_ptr<kappa::XDriveChassis> HolonomicSlew::getOutput() const {
   return chassis;
 }

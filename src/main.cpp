@@ -15,10 +15,6 @@ std::int32_t controllerSetText(uint32_t *t, std::uint8_t iline, std::uint8_t ico
 }
 
 void opcontrol() {
-  auto buttonA = (*robot::controller)[okapi::ControllerDigital::A];
-
-  auto headingController = std::make_shared<kappa::PidController>(kappa::PidController::Gains{0.1,0,0.1,0});
-
   pros::Task logTask([&]{
     while(true){
       auto pose = robot::odometry->get();

@@ -10,6 +10,8 @@ public:
 
   virtual void setTarget(const Pose &itarget) override;
 
+  virtual void stop() override;
+
   virtual void setOutputLimits(std::tuple<double,double,double> imin, std::tuple<double,double,double> imax);
 
   virtual std::tuple<double,double,double> getMinOutput() const;

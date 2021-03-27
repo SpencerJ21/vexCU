@@ -46,6 +46,10 @@ std::tuple<double,double,double> HoloPoseController::step(Pose ireading){
   };
 }
 
+void HoloPoseController::stop(){
+  output = {0, 0, 0};
+}
+
 bool HoloPoseController::isSettled(){
   if(stopping){
     return linearController->isSettled() && angularController->isSettled();
