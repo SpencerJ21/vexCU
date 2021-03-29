@@ -28,7 +28,7 @@ bool Intake::checkForClear(){
   return ballSensor.get_value() > clearThreshold;
 }
 
-void Intake::waitForBall(uint8_t numberOfBalls, uint32_t timeout){
+void Intake::waitForBall(uint8_t numberOfBalls, uint32_t timeout, bool assertClear){
   uint32_t maxTime = pros::millis() + timeout;
 
   // ensure intake is clear
@@ -41,15 +41,15 @@ void Intake::waitForBall(uint8_t numberOfBalls, uint32_t timeout){
     pros::delay(10);
   }
 
-  // wait until ball clears sensor
-  while(!checkForClear() && pros::millis() < maxTime){
+  // wait until ball clears sensor if specified
+  while(!checkForClear() && pros::millis() < maxTime && (assertClear || numberOfBalls > 1)){
     pros::delay(10);
   }
 
   if(numberOfBalls == 1){
     return;
   }else{
-    waitForBall(numberOfBalls - 1, maxTime - pros::millis());
+    waitForBall(numberOfBalls - 1, maxTime - pros::millis(), assertClear);
   }
 }
 

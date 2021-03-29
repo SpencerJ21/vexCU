@@ -12,7 +12,7 @@ public:
 
   bool checkForClear();
 
-  void waitForBall(uint8_t numberOfBalls, uint32_t timeout);
+  void waitForBall(uint8_t numberOfBalls, uint32_t timeout, bool assertClear = false);
 
   int32_t getSensorValue();
 

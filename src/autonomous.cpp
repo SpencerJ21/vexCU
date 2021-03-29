@@ -55,28 +55,29 @@ void autonomous() {
 
   // B1 ball
   robot::intake->runBField(0b10101101);
-  robot::intake->waitForBall(1, 1000);
-
+  robot::intake->waitForBall(1, 1000, true);
+/*
   robot::poseController->setTarget({26, 12, M_PI_2, 0, 0, 0});
   chassisWait(5000);
 
   robot::poseController->setTarget({26, 19, M_PI_2, 0, 0, 0});
-  robot::intake->waitForBall(1, 3000);
-
+  robot::intake->waitForBall(1, 3000, true);
+*/
   // BL goal
   robot::intake->runBField(0b10100000);
   robot::poseController->setTarget({13, 12, M_PI_2 + M_PI_4, 0, 0, 0});
   chassisWait(5000);
 
-  robot::intake->runBField(0b10100000);
+  robot::intake->idle();
   robot::poseController->setTarget({9, 19, M_PI_2 + M_PI_4, 0, 0, 0});
   chassisWait(3000);
 
   pushingAgainstGoal = true;
   robot::intake->runAll();
-  robot::intake->waitForBall(2, 3000);
+  robot::intake->waitForBall(2, 3000, true);
 
   robot::intake->outtake();
+  pros::delay(500);
 
   // Retreat and dump
   pushingAgainstGoal = false;
@@ -105,7 +106,7 @@ void autonomous() {
   robot::intake->waitForBall(1, 2000);
 
   robot::intake->outtake();
-  pros::delay(300);
+  pros::delay(500);
 
   // Retreat and dump
   pushingAgainstGoal = false;
@@ -119,7 +120,7 @@ void autonomous() {
 
   robot::intake->intake();
   robot::poseController->setTarget({97, 19, M_PI_2, 0, 0, 0});
-  robot::intake->waitForBall(1, 2000);
+  robot::intake->waitForBall(1, 2000, true);
 
   // BR goal
   robot::poseController->setTarget({110, 12, M_PI_4, 0, 0, 0});
@@ -131,9 +132,9 @@ void autonomous() {
 
   pushingAgainstGoal = true;
   robot::intake->runAll();
-  robot::intake->waitForBall(2, 3000);
+  robot::intake->waitForBall(2, 3000, true);
 
-  robot::intake->outtake();
+  //robot::intake->outtake();
 
   // retreat and dump
   pushingAgainstGoal = false;
@@ -160,8 +161,8 @@ void autonomous() {
   robot::intake->runAll();
   robot::intake->waitForBall(1, 2000);
 
-  robot::intake->outtake();
-  pros::delay(300);
+  robot::intake->runBField(0b01011010);
+  pros::delay(500);
 
   //retreat and dump
   pushingAgainstGoal = false;
@@ -175,25 +176,25 @@ void autonomous() {
 
   robot::poseController->setTarget({111, -65, -M_PI_2, 0, 0, 0});
   robot::intake->intake();
-  robot::intake->waitForBall(1, 3000);
+  robot::intake->waitForBall(1, 3000, true);
 
   // E6 ball
   robot::poseController->setTarget({100, -91, -M_PI_2, 0, 0, 0});
-  robot::intake->waitForBall(1, 2000);
+  robot::intake->waitForBall(1, 2000, true);
 
   // FR goal
-  robot::poseController->setTarget({109, -80, -M_PI_4, 0, 0, 0});
+  robot::poseController->setTarget({110, -80, -M_PI_4, 0, 0, 0});
   chassisWait(5000);
 
   robot::intake->idle();
-  robot::poseController->setTarget({118, -89, -M_PI_4, 0, 0, 0});
+  robot::poseController->setTarget({118, -88, -M_PI_4, 0, 0, 0});
   chassisWait(3000);
 
   pushingAgainstGoal = true;
   robot::intake->runAll();
-  robot::intake->waitForBall(2, 3000);
+  robot::intake->waitForBall(2, 3000, true);
 
-  robot::intake->outtake();
+  //robot::intake->outtake();
 
   // Dump and retreat
   pushingAgainstGoal = false;
@@ -218,7 +219,7 @@ void autonomous() {
   pros::delay(500);
 
   robot::intake->runAll();
-  robot::intake->waitForBall(1, 3000);
+  robot::intake->waitForBall(1, 2000);
 
   robot::intake->outtake();
   pros::delay(500);
@@ -235,7 +236,7 @@ void autonomous() {
   chassisWait(5000);
 
   robot::poseController->setTarget({25, -91, -M_PI_2, 0, 0, 0});
-  robot::intake->waitForBall(1, 3000);
+  robot::intake->waitForBall(1, 3000, true);
 
   // Middle goal
   robot::poseController->setTarget({43, -36, 0, 0, 0, 0});
