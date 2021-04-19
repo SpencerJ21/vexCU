@@ -16,7 +16,7 @@ public:
    *    iteration per unit speed (should be large)
    * @param ichassis XDrive chassis
    */
-  HolonomicSlew(double ispdSlewStep, double idirSlewStep, std::shared_ptr<kappa::XDriveChassis> ichassis);
+  HolonomicSlew(double ispdSlewStep, std::shared_ptr<kappa::XDriveChassis> ichassis);
 
   /**
    * Using a polar target signal of (velocity, direction, rotation),
@@ -38,7 +38,6 @@ public:
 protected:
   std::shared_ptr<kappa::XDriveChassis> chassis{nullptr};
   double spdSlewStep{0};
-  double dirSlewStep{0};
 
   std::tuple<double,double,double> out{0,0,0};
 };

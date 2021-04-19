@@ -36,7 +36,7 @@ void initialize(){
     );
 
 
-  robot::slewChassis = std::make_shared<HolonomicSlew>(2, 1000, robot::chassis);
+  robot::slewChassis = std::make_shared<HolonomicSlew>(2, robot::chassis);
 
   robot::imu = std::make_shared<kappa::ImuInput>(7);
 
