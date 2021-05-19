@@ -18,7 +18,7 @@ void opcontrol() {
   pros::Task logTask([&]{
     while(true){
       auto pose = robot::odometry->get();
-      std::cout << "(" << pose.x << ", " << pose.y << ", " << pose.theta << ")\tS=" << robot::intake->getSensorValue() << "\n";
+      std::cout << "(" << pose.x << ", " << pose.y << ", " << pose.theta << ")\n";
 
       //auto data = robot::sensorArray->get();
       //std::cout << data[0] << ", " << data[0] << ", " << data[0] << ", " << data[0] << "\n";
@@ -35,25 +35,25 @@ void opcontrol() {
     controllerSetText(&t, 0, 0, "STD       ");
 
     if(robot::controller->getDigital(okapi::ControllerDigital::up) || startTime + 500 > pros::millis()){
-      robot::intake->runBField(0b01111000);
+      robot::intake->execute(-8000, 0, 0);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
-      robot::intake->runAll();
+      robot::intake->execute(12000,12000,12000);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::R1)){
-      robot::intake->intake();
+      robot::intake->execute(12000,12000,0);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::L2)){
-      robot::intake->outtake();
+      robot::intake->execute(0,12000,12000);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::Y)){
-      robot::intake->dump();
+      robot::intake->execute(-12000,-12000,-12000);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::right)){
-      robot::intake->runBField(0b00000101);
+      robot::intake->execute(0,-12000,-12000);
 
     }else{
-      robot::intake->idle();
+      robot::intake->execute(0,0,0);
 
     }
 

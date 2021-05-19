@@ -1,7 +1,7 @@
 #include "intake.hpp"
 
-Intake::Intake(std::int8_t iintakeL, std::int8_t iintakeR, std::int8_t iuptake1, std::int8_t iouttake1, std::uint8_t isensor):
-  intakeL(okapi::Motor(iintakeL)), intakeR(okapi::Motor(iintakeR)), uptake1(okapi::Motor(iuptake1)), outtake1(okapi::Motor(iouttake1)), ballSensor(pros::ADILineSensor(isensor))
+Intake::Intake(std::int8_t iintakeL, std::int8_t iintakeR, std::int8_t iuptake1, std::int8_t iouttake1, std::uint8_t ilowerSensor, std::uint8_t iupperSensor):
+  intakeL(okapi::Motor(iintakeL)), intakeR(okapi::Motor(iintakeR)), uptake1(okapi::Motor(iuptake1)), outtake1(okapi::Motor(iouttake1)), lowerBallSensor(pros::ADILineSensor(ilowerSensor)), upperBallSensor(pros::ADILineSensor(iupperSensor))
 {
   intakeL.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
   intakeR.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
@@ -18,16 +18,55 @@ std::pair<int32_t, int32_t> Intake::getThresholds(){
   return {clearThreshold, detectionThreshold};
 }
 
-bool Intake::checkForBall(){
-  std::cout << "O\t" << ballSensor.get_value() << "\n";
-  return ballSensor.get_value() < detectionThreshold;
+bool Intake::checkForBallLower(){
+  std::cout << "L(O)\t" << lowerBallSensor.get_value() << "\n";
+  return lowerBallSensor.get_value() < detectionThreshold;
 }
 
-bool Intake::checkForClear(){
-  std::cout << "X\t" << ballSensor.get_value() << "\n";
-  return ballSensor.get_value() > clearThreshold;
+bool Intake::checkForClearLower(){
+  std::cout << "L(X)\t" << lowerBallSensor.get_value() << "\n";
+  return lowerBallSensor.get_value() > clearThreshold;
 }
 
+bool Intake::checkForBallUpper(){
+  std::cout << "U(O)\t" << upperBallSensor.get_value() << "\n";
+  return upperBallSensor.get_value() < detectionThreshold;
+}
+
+bool Intake::checkForClearUpper(){
+  std::cout << "U(X)\t" << upperBallSensor.get_value() << "\n";
+  return upperBallSensor.get_value() > clearThreshold;
+}
+
+void Intake::incrementBallCounter(bool lowerEvent, bool upperEvent){
+  lowerCounter += lowerEvent ? 0.5 : 0;
+  upperCounter += upperEvent ? 0.5 : 0;
+}
+
+std::pair<double,double> Intake::getBallCounts(){
+  return {lowerCounter, upperCounter};
+}
+
+std::pair<int32_t,int32_t> Intake::getSensorValues(){
+  return {lowerBallSensor.get_value(), upperBallSensor.get_value()};
+}
+
+void Intake::execute(double intakeV, double uptakeV, double outtakeV){
+  if(intakeV != -1){
+    intakeL.moveVoltage(intakeV);
+    intakeR.moveVoltage(intakeV);
+  }
+
+  if(uptakeV != -1){
+    uptake1.moveVoltage(uptakeV);
+  }
+
+  if(outtakeV != -1){
+    outtake1.moveVoltage(outtakeV);
+  }
+}
+
+/*
 void Intake::waitForBall(uint8_t numberOfBalls, uint32_t timeout, bool assertClear){
   uint32_t maxTime = pros::millis() + timeout;
 
@@ -52,34 +91,4 @@ void Intake::waitForBall(uint8_t numberOfBalls, uint32_t timeout, bool assertCle
     waitForBall(numberOfBalls - 1, maxTime - pros::millis(), assertClear);
   }
 }
-
-int32_t Intake::getSensorValue(){
-  return ballSensor.get_value();
-}
-
-void Intake::runBField(uint8_t bfield){
-  intakeL.moveVoltage(voltage[(bfield & 0b11000000) >> 6]);
-  intakeR.moveVoltage(voltage[(bfield & 0b00110000) >> 4]);
-  uptake1.moveVoltage(voltage[(bfield & 0b00001100) >> 2]);
-  outtake1.moveVoltage(voltage[bfield & 0b00000011]);
-}
-
-void Intake::intake(){
-  runBField(0b10101000);
-}
-
-void Intake::outtake(){
-  runBField(0b00001010);
-}
-
-void Intake::runAll(){
-  runBField(0b10101010);
-}
-
-void Intake::dump(){
-  runBField(0b01010101);
-}
-
-void Intake::idle(){
-  runBField(0b00000000);
-}
+*/

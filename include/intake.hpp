@@ -2,31 +2,28 @@
 
 class Intake {
 public:
-  Intake(std::int8_t iintakeL, std::int8_t iintakeR, std::int8_t iuptake1, std::int8_t iouttake1, std::uint8_t isensor);
+  Intake(std::int8_t iintakeL, std::int8_t iintakeR, std::int8_t iuptake1, std::int8_t iouttake1, std::uint8_t ibottomSensor, std::uint8_t iupperSensor);
 
   void setThresholds(double idetectionThreshold, double iclearThreshold);
 
   std::pair<int32_t, int32_t> getThresholds();
 
-  bool checkForBall();
+  bool checkForBallLower();
 
-  bool checkForClear();
+  bool checkForClearLower();
 
-  void waitForBall(uint8_t numberOfBalls, uint32_t timeout, bool assertClear = false);
+  bool checkForBallUpper();
 
-  int32_t getSensorValue();
+  bool checkForClearUpper();
 
-  void runBField(uint8_t bfield);
+  void incrementBallCounter(bool lowerEvent, bool upperEvent);
 
-  void intake();
+  std::pair<double,double> getBallCounts();
 
-  void outtake();
+  std::pair<int32_t,int32_t> getSensorValues();
 
-  void runAll();
-
-  void dump();
-
-  void idle();
+  // set -1 to not update
+  void execute(double intakeV, double uptakeV, double outtakeV);
 
 private:
   okapi::Motor intakeL;
@@ -34,9 +31,11 @@ private:
   okapi::Motor uptake1;
   okapi::Motor outtake1;
 
-  pros::ADILineSensor ballSensor;
+  pros::ADILineSensor lowerBallSensor;
+  pros::ADILineSensor upperBallSensor;
   int32_t detectionThreshold;
   int32_t clearThreshold;
 
-  const int16_t voltage[4]{0, -12000, 12000, 6000};
+  double lowerCounter{1};
+  double upperCounter{0};
 };

@@ -47,7 +47,7 @@ void initialize(){
     robot::imu
   });
 
-  robot::intake = std::make_shared<Intake>(3,-2,8,10,2);
+  robot::intake = std::make_shared<Intake>(3,-2,8,10,2,1);
 
   robot::controller = std::make_shared<okapi::Controller>();
 
