@@ -67,7 +67,7 @@ void initialize(){
       okapi::TimeUtilFactory::withSettledUtilParams(0.2, 0.05, 10 * okapi::millisecond))
   );
 
-  robot::poseController->setOutputLimits({-0.6*robot::maxLinearSpeed, 0, -0.6*robot::maxAngularSpeed}, {0.6*robot::maxLinearSpeed, 0, 0.6*robot::maxAngularSpeed});
+  robot::poseController->setOutputLimits({-0.8*robot::maxLinearSpeed, 0, -0.8*robot::maxAngularSpeed}, {0.8*robot::maxLinearSpeed, 0, 0.8*robot::maxAngularSpeed});
 
   auto calibrationTime = pros::millis();
 

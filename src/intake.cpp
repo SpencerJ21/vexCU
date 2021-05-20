@@ -19,22 +19,22 @@ std::pair<int32_t, int32_t> Intake::getThresholds(){
 }
 
 bool Intake::checkForBallLower(){
-  std::cout << "L(O)\t" << lowerBallSensor.get_value() << "\n";
+  //std::cout << "L(O)\t" << lowerBallSensor.get_value() << "\n";
   return lowerBallSensor.get_value() < detectionThreshold;
 }
 
 bool Intake::checkForClearLower(){
-  std::cout << "L(X)\t" << lowerBallSensor.get_value() << "\n";
+  //std::cout << "L(X)\t" << lowerBallSensor.get_value() << "\n";
   return lowerBallSensor.get_value() > clearThreshold;
 }
 
 bool Intake::checkForBallUpper(){
-  std::cout << "U(O)\t" << upperBallSensor.get_value() << "\n";
+  //std::cout << "U(O)\t" << upperBallSensor.get_value() << "\n";
   return upperBallSensor.get_value() < detectionThreshold;
 }
 
 bool Intake::checkForClearUpper(){
-  std::cout << "U(X)\t" << upperBallSensor.get_value() << "\n";
+  //std::cout << "U(X)\t" << upperBallSensor.get_value() << "\n";
   return upperBallSensor.get_value() > clearThreshold;
 }
 

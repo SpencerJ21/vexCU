@@ -22,8 +22,8 @@ void intakeCycle(double bottom, double top, double timeout){
   double t = pros::millis() + timeout;
 
   while(pros::millis() < t){
-    switch(((targetBallCounts.first  >= robot::intake->getBallCounts().first) << 1) +
-            (targetBallCounts.second >= robot::intake->getBallCounts().second)){
+    switch(((targetBallCounts.first  <= robot::intake->getBallCounts().first) << 1) +
+            (targetBallCounts.second <= robot::intake->getBallCounts().second)){
       case 0b00: // Awaiting balls at top and bottom sensors
         robot::intake->execute(12000,12000,12000);
         break;
@@ -45,6 +45,17 @@ void intakeCycle(double bottom, double top, double timeout){
   }
 }
 
+void intakeNoMid(double bottom, double timeout){
+  auto targetBallCount = robot::intake->getBallCounts().first + bottom;
+  double t = pros::millis() + timeout;
+
+  robot::intake->execute(12000, 0, 0);
+
+  while(pros::millis() < t && targetBallCount > robot::intake->getBallCounts().first){
+    pros::delay(50);
+  }
+}
+
 
 void autonomous() {
 
@@ -62,7 +73,7 @@ void autonomous() {
       }
 
       while(pushingAgainstGoal){
-        robot::chassis->set({15, 0, 0});
+        robot::chassis->set({12, 0, 0});
         pros::delay(10);
       }
     }
@@ -79,19 +90,22 @@ void autonomous() {
           robot::intake->incrementBallCounter(true, false);
         }
       }else{
-        robot::intake->checkForBallLower();
-        bottomOccupied = true;
-        robot::intake->incrementBallCounter(true, false);
+        if(robot::intake->checkForBallLower()){
+          bottomOccupied = true;
+          robot::intake->incrementBallCounter(true, false);
+        }
       }
 
       if(topOccupied){
-        robot::intake->checkForClearUpper();
-        topOccupied = false;
-        robot::intake->incrementBallCounter(false, true);
+        if(robot::intake->checkForClearUpper()){
+          topOccupied = false;
+          robot::intake->incrementBallCounter(false, true);
+        }
       }else{
-        robot::intake->checkForBallUpper();
-        topOccupied = true;
-        robot::intake->incrementBallCounter(false, true);
+        if(robot::intake->checkForBallUpper()){
+          topOccupied = true;
+          robot::intake->incrementBallCounter(false, true);
+        }
       }
       pros::delay(10);
     }
@@ -110,29 +124,45 @@ void autonomous() {
     }
   }, "Log Task");
 
+  double ballCountFlag = 0;
+
   // deploy
-  robot::intake->execute(-8000, 0, 0);
+  robot::intake->execute(6000, 0, 0);
   pros::delay(500);
 
   // B1 ball
   intakeCycle(1, 0, 1000);
-/*
-  robot::poseController->setTarget({26, 12, M_PI_2, 0, 0, 0});
-  chassisWait(5000);
 
-  robot::poseController->setTarget({26, 19, M_PI_2, 0, 0, 0});
-  robot::intake->waitForBall(1, 3000, true);
-*/
-  // BL goal
-  //robot::intake->execute(4000, 0, 0);
-  robot::poseController->setTarget({13, 12, M_PI_2 + M_PI_4, 0, 0, 0});
-  chassisWait(5000);
-
-  robot::poseController->setTarget({9, 19, M_PI_2 + M_PI_4, 0, 0, 0});
+  // ML goal
+  robot::poseController->setTarget({18, -36, -M_PI, 0, 0, 0});
   chassisWait(3000);
 
   pushingAgainstGoal = true;
-  intakeCycle(1.5, 2, 3000);
+  intakeCycle(0.5, robot::intake->getBallCounts().first - ballCountFlag > 1.0 ? 2.0 : 1.0, 3000);
+
+  // Dump and retreat
+  pushingAgainstGoal = false;
+  robot::intake->execute(-12000, -12000, -12000);
+  robot::poseController->setTarget({18, -38, -M_PI, 0, 0, 0});
+  chassisWait(3000);
+
+
+  robot::poseController->setTarget({26, 12, -M_PI - M_PI_2, 0, 0, 0});
+  chassisWait(5000);
+
+  robot::poseController->setTarget({26, 19, -M_PI - M_PI_2, 0, 0, 0});
+  intakeCycle(1,0,2000);
+
+  // BL goal
+  //robot::intake->execute(4000, 0, 0);
+  robot::poseController->setTarget({13, 12, -M_PI - M_PI_4, 0, 0, 0});
+  chassisWait(5000);
+
+  robot::poseController->setTarget({9, 19, -M_PI - M_PI_4, 0, 0, 0});
+  chassisWait(3000);
+
+  pushingAgainstGoal = true;
+  intakeCycle(1.5, 1, 3000);
 
   //robot::intake->outtake();
   //pros::delay(500);
@@ -140,16 +170,18 @@ void autonomous() {
   // Retreat and dump
   pushingAgainstGoal = false;
   robot::intake->execute(-12000, -12000, -12000);
-  robot::poseController->setTarget({30, -5, M_PI_2, 0, 0, 0});
+  robot::poseController->setTarget({30, -5, 0, 0, 0, 0});
   chassisWait(5000);
 
   // C2 ball
-  robot::intake->execute(12000, 12000, -4000);
+  ballCountFlag = robot::intake->getBallCounts().first;
   robot::poseController->setTarget({36, -13, -0.1, 0, 0, 0});
-  chassisWait(5000);
+  intakeCycle(1, 0, 2000);
+  chassisWait(3000);
 
   robot::poseController->setTarget({60, -13, 0, 0, 0, 0});
-  chassisWait(5000);
+  intakeNoMid(1, 2000);
+  chassisWait(3000);
 
   // C1 ball
   robot::poseController->setTarget({62, -12, M_PI_2, 0, 0, 0});
@@ -160,7 +192,7 @@ void autonomous() {
   chassisWait(3000);
 
   pushingAgainstGoal = true;
-  intakeCycle(0.5, 2, 2000);
+  intakeCycle(0.5, robot::intake->getBallCounts().first - ballCountFlag == 2.0 ? 2.0 : 1.0, 2000);
 
   //robot::intake->outtake();
   //pros::delay(500);
@@ -187,7 +219,8 @@ void autonomous() {
   chassisWait(3000);
 
   pushingAgainstGoal = true;
-  intakeCycle(1.5, 1, 3000);
+  intakeCycle(2, 1, 3000);
+  robot::intake->execute(6000, 0, 0);
 
   //robot::intake->outtake();
 
@@ -225,18 +258,21 @@ void autonomous() {
   chassisWait(3000);
 
   // E5 ball
+  ballCountFlag = robot::intake->getBallCounts().first;
   robot::poseController->setTarget({111, -50, -M_PI_2, 0, 0, 0});
   chassisWait(3000);
 
   robot::poseController->setTarget({111, -65, -M_PI_2, 0, 0, 0});
-  intakeCycle(1, 0, 3000);
+  robot::intake->execute(12000, 12000, 0);
+  chassisWait(3000);
 
   // E6 ball
   robot::poseController->setTarget({100, -91, -M_PI_2, 0, 0, 0});
-  intakeCycle(1, 0, 3000);
+  pros::delay(500);
+  intakeNoMid(1, 1500);
 
   // FR goal
-  robot::poseController->setTarget({110, -80, -M_PI_4, 0, 0, 0});
+  robot::poseController->setTarget({111, -80, -M_PI_4, 0, 0, 0});
   chassisWait(5000);
 
   robot::intake->execute(0, 0, 0);
@@ -244,7 +280,7 @@ void autonomous() {
   chassisWait(3000);
 
   pushingAgainstGoal = true;
-  intakeCycle(1.5, 2, 3000);
+  intakeCycle(1.5, robot::intake->getBallCounts().first - ballCountFlag == 2.0 ? 2.0 : 1.0, 3000);
 
   //robot::intake->outtake();
 
@@ -255,7 +291,8 @@ void autonomous() {
   chassisWait(3000);
 
   // C4 ball
-  robot::intake->execute(12000, 0, 0);
+  ballCountFlag = robot::intake->getBallCounts().first;
+  robot::intake->execute(12000, 12000, 0);
   robot::poseController->setTarget({83, -58, -M_PI, 0, 0, 0});
   chassisWait(5000);
 
@@ -263,6 +300,9 @@ void autonomous() {
   chassisWait(5000);
 
   // C5 ball
+  pros::delay(500);
+
+  robot::intake->execute(12000, 0, 0);
   robot::poseController->setTarget({62, -82, -M_PI_2, 0, 0, 0});
   chassisWait(5000);
 
@@ -270,7 +310,7 @@ void autonomous() {
   pushingAgainstGoal = true;
   pros::delay(500);
 
-  intakeCycle(0.5, 2, 2000);
+  intakeCycle(0.5, robot::intake->getBallCounts().first - ballCountFlag == 2.0 ? 2.0 : 1.0, 2000);
 
   //robot::intake->outtake();
   //pros::delay(500);
@@ -280,11 +320,29 @@ void autonomous() {
   robot::poseController->setTarget({62, -75, -M_PI/3, 0, 0, 0});
   robot::intake->execute(-12000, -12000, -12000);
   chassisWait(3000);
+  // A5 ball
+  robot::intake->execute(0, 0, 0);
+  robot::poseController->setTarget({35, -72, -M_PI, 0, 0, 0});
+  chassisWait(3000);
+
+  robot::poseController->setTarget({22, -72, -M_PI, 0, 0, 0});
+  intakeCycle(1, 0, 2000);
+
+  // FL goal
+  robot::poseController->setTarget({13, -91, -M_PI_2 - M_PI_4, 0, 0, 0});
+  chassisWait(3000);
+
+  pushingAgainstGoal = true;
+  intakeCycle(0, 1, 2000);
+  pros::delay(300);
+
+  // Retreat and dump
+  pushingAgainstGoal = false;
+  robot::poseController->setTarget({26, -77, -M_PI_2, 0, 0, 0});
+  robot::intake->execute(-12000, -12000, -12000);
+  chassisWait(3000);
 
   // B6 ball
-  robot::poseController->setTarget({24, -77, -M_PI/3, 0, 0, 0});
-  chassisWait(5000);
-
   robot::poseController->setTarget({25, -91, -M_PI_2, 0, 0, 0});
   intakeCycle(1, 0, 2000);
 
@@ -295,7 +353,7 @@ void autonomous() {
   pushingAgainstGoal = true;
   intakeCycle(1, 0, 5000);
 
-  intakeCycle(2, 1, 3000);
+  intakeCycle(1.5, 1, 3000);
 
   robot::intake->execute(0, 0, 0);
   pushingAgainstGoal = false;
