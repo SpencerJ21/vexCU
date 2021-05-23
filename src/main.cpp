@@ -35,28 +35,36 @@ void opcontrol() {
     controllerSetText(&t, 0, 0, "STD       ");
 
     if(robot::controller->getDigital(okapi::ControllerDigital::up) || startTime + 500 > pros::millis()){
+      // Slow outtake for deploy
       robot::intake->execute(-8000, 0, 0);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::L1)){
+      // Intake and score
       robot::intake->execute(12000,12000,12000);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::R1)){
+      // Intake no score
       robot::intake->execute(12000,12000,0);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::L2)){
+      // Score no intake
       robot::intake->execute(0,12000,12000);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::Y)){
+      // Outtake all rollers
       robot::intake->execute(-12000,-12000,-12000);
 
     }else if(robot::controller->getDigital(okapi::ControllerDigital::right)){
+      // Reverse top rollers
       robot::intake->execute(0,-12000,-12000);
 
     }else{
+      // Idle
       robot::intake->execute(0,0,0);
 
     }
 
+    // Drive half speed if R2 pressed
     double driveScalar = robot::controller->getDigital(okapi::ControllerDigital::R2) ? 0.5 : 1.0;
 
     robot::chassis->set({

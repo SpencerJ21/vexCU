@@ -1,5 +1,9 @@
 #include "kappaAux/odometry.hpp"
 
+// IF YOU TAKE THIS CODE AND COPY PASTE AND USE IT INSTEAD OF LEARNING/MAKING YOUR
+// OWN ODOMETRY CODE YOU ARE BAD AND SHOULD FEEL BAD. GO READ THE PILONS DOCUMENT
+// AND CREATE YOUR OWN CODE BASED OFF IT
+
 Odom3EncImu::Odom3EncImu(
               double irearOffset,
               std::unique_ptr<okapi::Filter> itanVelFilter,
@@ -15,6 +19,8 @@ Odom3EncImu::Odom3EncImu(
   }
 
 const Pose &Odom3EncImu::step() {
+  // Essentially the same as pilons but apply small angle approx to simplify
+
   const std::array<double,4> &in = input->get();
 
   double dT = 0.001 * (pros::millis() - lastIn[4]);

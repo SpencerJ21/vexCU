@@ -9,7 +9,7 @@ HoloPoseController::HoloPoseController(std::unique_ptr<kappa::PidController> ili
 void HoloPoseController::setTarget(const Pose &itarget) {
   target = itarget;
 
-  linearController->setTarget(0); // drive distance to 0
+  linearController->setTarget(0); // drive distance (to target) to 0
   angularController->setTarget(target.theta); //drive heading to target theta
 }
 
@@ -34,15 +34,17 @@ std::tuple<double,double,double> HoloPoseController::step(Pose ireading){
     return {0,0,0};
   }
 
+  // Error vector in global coords
   double dy = target.y - ireading.y;
   double dx = target.x - ireading.x;
 
+  // Distance error
   distance = sqrt(dy * dy + dx * dx);
 
   return {
-    std::clamp(linearController->step(-distance), std::get<0>(outputMin), std::get<0>(outputMax)),
-    atan2(dy,dx) - ireading.theta,
-    std::clamp(angularController->step(ireading.theta), std::get<2>(outputMin), std::get<2>(outputMax))
+    std::clamp(linearController->step(-distance), std::get<0>(outputMin), std::get<0>(outputMax)),      // Apply PID controller to distance and set to linear speed
+    atan2(dy,dx) - ireading.theta,                                                                      // Heading to target point in local coordinates
+    std::clamp(angularController->step(ireading.theta), std::get<2>(outputMin), std::get<2>(outputMax)) // Apply PID controller to angle error and set to angular speed
   };
 }
 

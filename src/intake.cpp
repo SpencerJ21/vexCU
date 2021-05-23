@@ -39,6 +39,10 @@ bool Intake::checkForClearUpper(){
 }
 
 void Intake::incrementBallCounter(bool lowerEvent, bool upperEvent){
+  // Increment by 0.5 for all events (rising cases and falling cases)
+  // In effect, whole numbers represent balls that have passed through
+  // and half counts represent a ball currently in front of sensor
+
   lowerCounter += lowerEvent ? 0.5 : 0;
   upperCounter += upperEvent ? 0.5 : 0;
 }
@@ -65,30 +69,3 @@ void Intake::execute(double intakeV, double uptakeV, double outtakeV){
     outtake1.moveVoltage(outtakeV);
   }
 }
-
-/*
-void Intake::waitForBall(uint8_t numberOfBalls, uint32_t timeout, bool assertClear){
-  uint32_t maxTime = pros::millis() + timeout;
-
-  // ensure intake is clear
-  while(!checkForClear() && pros::millis() < maxTime){
-    pros::delay(10);
-  }
-
-  // wait until ball is detected
-  while(!checkForBall() && pros::millis() < maxTime){
-    pros::delay(10);
-  }
-
-  // wait until ball clears sensor if specified
-  while(!checkForClear() && pros::millis() < maxTime && (assertClear || numberOfBalls > 1)){
-    pros::delay(10);
-  }
-
-  if(numberOfBalls == 1){
-    return;
-  }else{
-    waitForBall(numberOfBalls - 1, maxTime - pros::millis(), assertClear);
-  }
-}
-*/

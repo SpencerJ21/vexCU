@@ -1,10 +1,9 @@
 #include "main.h"
 #include "robot.hpp"
 
-bool pushingAgainstGoal = false;
-
 uint16_t chassisMoveId = 0;
 
+// Blocks until either chassis target is reached or timeout time has passed
 void chassisWait(double timeout){
   double t = pros::millis() + timeout;
 
@@ -15,6 +14,9 @@ void chassisWait(double timeout){
   std::cout << "Move:  " << chassisMoveId++ << "\t" << pros::millis() + timeout - t << "\n";
 }
 
+// Blocks until either cycling is complete or timeout is reached
+// bottom/top refer to the number of balls needed to pass the respective sensor
+// in order to complete cycle
 void intakeCycle(double bottom, double top, double timeout){
   auto targetBallCounts = robot::intake->getBallCounts();
   targetBallCounts.first += bottom;
@@ -22,22 +24,23 @@ void intakeCycle(double bottom, double top, double timeout){
   double t = pros::millis() + timeout;
 
   while(pros::millis() < t){
+    // Generate bitfield of meeting bottom cycle target and meeting top cycle target
     switch(((targetBallCounts.first  <= robot::intake->getBallCounts().first) << 1) +
             (targetBallCounts.second <= robot::intake->getBallCounts().second)){
       case 0b00: // Awaiting balls at top and bottom sensors
-        robot::intake->execute(12000,12000,12000);
+        robot::intake->execute(12000,12000,12000); // Run all rollers
         break;
       case 0b01: // Awaiting ball(s) at bottom sensor
-        robot::intake->execute(12000,12000,0);
+        robot::intake->execute(12000,12000,0); // Run bottom rollers
         break;
       case 0b10: // Awaiting ball(s) at top sensor
-        robot::intake->execute(0,12000,12000);
+        robot::intake->execute(0,12000,12000); // Run top rollers
         break;
       case 0b11: // Awaiting no balls
-        robot::intake->execute(0,0,0);
+        robot::intake->execute(0,0,0); // Stop rollers and stop blocking
         return;
 
-      default:
+      default: // Unreachable state
         std::cout << "You broke it idiot\n";
         break;
     }
@@ -45,6 +48,7 @@ void intakeCycle(double bottom, double top, double timeout){
   }
 }
 
+// Same as above but middle rollers do not run (and top rollers are inapplicable)
 void intakeNoMid(double bottom, double timeout){
   auto targetBallCount = robot::intake->getBallCounts().first + bottom;
   double t = pros::millis() + timeout;
@@ -59,20 +63,25 @@ void intakeNoMid(double bottom, double timeout){
 
 void autonomous() {
 
+  bool pushingAgainstGoal = false;
+
   pros::Task chassisThread([&]{
     while(true){
       while(!robot::poseController->isSettled() && !pushingAgainstGoal){
+        // Move to target while not settled
         robot::slewChassis->set(robot::poseController->step(robot::odometry->get()));
         pros::delay(10);
       }
 
       while(robot::poseController->isSettled() && !pushingAgainstGoal){
+        // Hold position while settled
         robot::poseController->step(robot::odometry->get());
         robot::slewChassis->set({0,0,0});
         pros::delay(10);
       }
 
       while(pushingAgainstGoal){
+        // Push forward
         robot::chassis->set({12, 0, 0});
         pros::delay(10);
       }
@@ -80,6 +89,7 @@ void autonomous() {
   }, "Auton Chassis Runner");
 
   pros::Task ballCounterThread([&]{
+    // Boolean states of if ball is in front of sensor
     bool bottomOccupied = false;
     bool topOccupied = false;
 
